@@ -1,0 +1,45 @@
+# Mubbashir's Coding Taste
+- Use Next.js (App Router) with TypeScript, Tailwind CSS, and React. Confidence: 0.85
+- Accept variant and size props on all reusable components. Confidence: 0.85
+- Spread remaining props onto root element via ...rest for extensibility. Confidence: 0.85
+- Forward refs using React.forwardRef on all interactive elements. Confidence: 0.85
+- Export component props as a named type (e.g., export type ButtonProps). Confidence: 0.85
+- Never hardcode colors, font sizes, or spacing; always use theme tokens. Confidence: 0.85
+- Create foundation components first (Button, Input, Text, Card, Badge, Spinner, Modal, Tooltip) before feature code. Confidence: 0.85
+- Place UI components in components/ui/ and export from a barrel index.ts. Confidence: 0.85
+- Use cn() utility (clsx + tailwind-merge) for conditional class names. Confidence: 0.85
+- Default to RSC (Server Components); add 'use client' only when using useState, useEffect, event handlers, or browser APIs. Confidence: 0.85
+- Use generateStaticParams + revalidate=false for SSG, revalidate=N for ISR, force-dynamic for SSR. Confidence: 0.85
+- Wrap client interaction islands with Suspense and Skeleton fallback. Confidence: 0.85
+- Split components into smallest meaningful units with separate files for types, skeleton, client/server variants. Confidence: 0.85
+- Never hardcode visual values; use CSS variable-based theme tokens for all colors, font sizes, spacing, border-radius, and shadows. Confidence: 0.85
+- Configure Tailwind to reference CSS variables matching the theme tokens. Confidence: 0.85
+- Render all text via Text or Heading components; never use raw p, h1-h6, or span with hardcoded size classes. Confidence: 0.85
+- Use strict 3-layer API pattern: routes (URL constants), controllers (business logic/transform), and public index exports. Confidence: 0.85
+- Build a base http wrapper that handles auth headers, 401 redirect, consistent error shape, and interceptors. Confidence: 0.85
+- Never inline fetch calls inside components or pages. Confidence: 0.85
+- Use strict: true in tsconfig.json; never use any (use unknown and narrow instead). Confidence: 0.85
+- Use type for unions and intersections, interface for object shapes. Confidence: 0.85
+- Prefer explicit return types on exported functions. Confidence: 0.85
+- Co-locate component-specific types in Component.types.ts; global types in types/. Confidence: 0.85
+- Folders: kebab-case; Component files: PascalCase.tsx; Utility/hook files: camelCase.ts. Confidence: 0.85
+- Service files: camelCase.service.ts / camelCase.controller.ts. Confidence: 0.85
+- Constants: SCREAMING_SNAKE_CASE for values, camelCase for file name. Confidence: 0.85
+- Include index.ts barrel files in every folder for clean imports. Confidence: 0.85
+- Extract any stateful or side-effect logic of 3+ lines into custom hooks in hooks/. Confidence: 0.85
+- Return an object from hooks (not array) unless it's a simple toggle. Confidence: 0.85
+- Handle cleanup in useEffect returns. Confidence: 0.85
+- Wrap every async boundary with Suspense + Skeleton fallback and an ErrorBoundary. Confidence: 0.85
+- Co-locate skeleton components with features (e.g., UserCard.skeleton.tsx). Confidence: 0.85
+- Never show raw error strings; map to user-friendly messages. Confidence: 0.85
+- All interactive elements must have accessible labels (aria-label, aria-describedby, or visible text). Confidence: 0.85
+- Images always need alt text (empty alt="" for decorative images). Confidence: 0.85
+- Never use color alone to convey meaning; pair with icon or text. Confidence: 0.85
+- Maintain visible focus styles; never set outline: none without replacement. Confidence: 0.85
+- Use semantic HTML first; never use div with onClick. Confidence: 0.85
+- Wrap expensive computations in useMemo/useCallback when dependencies are stable. Confidence: 0.85
+- Use next/image for all images and next/link for all internal navigation. Confidence: 0.85
+- Dynamic import heavy client components with ssr: false. Confidence: 0.85
+- No commented-out code committed to main and no console.log in production (use a logger). Confidence: 0.85
+- Order imports: React → Next.js → third-party → internal absolute → relative. Confidence: 0.85
+- One component per file; one concern per function. Confidence: 0.85
