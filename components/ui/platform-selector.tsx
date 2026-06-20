@@ -64,7 +64,7 @@ export function PlatformSelector({
                     : "bg-zinc-50 border-zinc-200 hover:border-zinc-300 text-zinc-500 hover:text-zinc-800"
               )}
             >
-              <span className="text-2xl shrink-0">{IconComp as any}</span>
+              <span className="text-2xl shrink-0"><IconComp /></span>
               <span className="text-xs font-semibold">{plat.name}</span>
             </button>
           );

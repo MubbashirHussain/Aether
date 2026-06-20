@@ -75,13 +75,14 @@ interface DownloadHistoryItem {
 }
 
 export default function App() {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("vdl_theme");
-      return saved === "light" || saved === "dark" ? saved : "dark";
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("vdl_theme");
+    if (saved === "light" || saved === "dark") {
+      setTheme(saved);
     }
-    return "dark";
-  });
+  }, []);
 
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [activePlatform, setActivePlatform] = useState<string>("all");
@@ -531,7 +532,7 @@ export default function App() {
         id="downloader-section"
         className="max-w-6xl mx-auto px-4 py-6 sm:py-8 relative z-10"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
           <VideoDownloader
             isDark={isDark}
             videoUrl={videoUrl}
