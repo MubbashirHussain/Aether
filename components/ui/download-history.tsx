@@ -41,7 +41,7 @@ export function DownloadHistory({
       <div
         className={cn(
           "flex items-center justify-between mb-4 pb-3 border-b gap-2",
-          isDark ? "border-zinc-850" : "border-zinc-200"
+          isDark ? "border-zinc-850" : "border-zinc-200",
         )}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -55,7 +55,9 @@ export function DownloadHistory({
             onClick={onClearHistory}
             className={cn(
               "text-xs font-semibold transition shrink-0 cursor-pointer",
-              isDark ? "text-zinc-400 hover:text-zinc-200" : "text-zinc-500 hover:text-zinc-800"
+              isDark
+                ? "text-zinc-400 hover:text-zinc-200"
+                : "text-zinc-500 hover:text-zinc-800",
             )}
           >
             Purge Storage
@@ -65,7 +67,7 @@ export function DownloadHistory({
 
       {downloadHistory.length === 0 ? (
         <div className={cn("text-center py-6 rounded-xl border", innerCardBg)}>
-          <p className="text-xs text-zinc-500 font-mono">
+          <p className="text-xs text-zinc-500 font-mono p-4">
             No downloaded files in local cache yet.
           </p>
         </div>
@@ -78,20 +80,28 @@ export function DownloadHistory({
                 "p-3 rounded-xl flex items-center gap-3 border transition",
                 isDark
                   ? "bg-zinc-950 border-zinc-850 hover:border-zinc-800"
-                  : "bg-zinc-50 border-zinc-200 hover:border-zinc-300 shadow-sm"
+                  : "bg-zinc-50 border-zinc-200 hover:border-zinc-300 shadow-sm",
               )}
             >
               <img
                 src={item.thumbnail}
                 alt="history item preview"
-                className={cn("w-10 h-10 rounded object-cover shrink-0 opacity-70 border", isDark ? "border-zinc-800" : "border-zinc-250 shadow-sm")}
+                className={cn(
+                  "w-10 h-10 rounded object-cover shrink-0 opacity-70 border",
+                  isDark ? "border-zinc-800" : "border-zinc-250 shadow-sm",
+                )}
               />
 
               <div className="min-w-0 flex-1">
                 <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">
                   {item.platform}
                 </span>
-                <h4 className={cn("text-xs font-semibold truncate mt-0.5", textTitle)}>
+                <h4
+                  className={cn(
+                    "text-xs font-semibold truncate mt-0.5",
+                    textTitle,
+                  )}
+                >
                   {item.title}
                 </h4>
               </div>
@@ -103,7 +113,7 @@ export function DownloadHistory({
                     "p-1.5 rounded border transition cursor-pointer",
                     isDark
                       ? "bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-450"
-                      : "bg-white hover:bg-zinc-100 border-zinc-250 text-zinc-500 shadow-sm"
+                      : "bg-white hover:bg-zinc-100 border-zinc-250 text-zinc-500 shadow-sm",
                   )}
                   title="Copy Link"
                 >
@@ -119,7 +129,7 @@ export function DownloadHistory({
                     "p-1.5 rounded border transition cursor-pointer",
                     isDark
                       ? "bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-300 hover:text-white"
-                      : "bg-white hover:bg-zinc-100 border-zinc-250 text-zinc-650 shadow-sm"
+                      : "bg-white hover:bg-zinc-100 border-zinc-250 text-zinc-650 shadow-sm",
                   )}
                   title="Re-fetch Video Stream"
                 >

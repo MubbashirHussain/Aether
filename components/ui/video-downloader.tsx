@@ -1,6 +1,14 @@
 "use client";
 
-import { Download, ShieldCheck, Lock, TrendingUp, Info, AlertCircle } from "lucide-react";
+import {
+  Download,
+  ShieldCheck,
+  Lock,
+  TrendingUp,
+  Info,
+  AlertCircle,
+  Search,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type VideoDownloaderProps = {
@@ -48,21 +56,28 @@ export function VideoDownloader({
             "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-mono tracking-wider uppercase border",
             isDark
               ? "bg-zinc-900 border-zinc-800 text-zinc-400"
-              : "bg-white border-zinc-200 text-zinc-500 shadow-sm"
+              : "bg-white border-zinc-200 text-zinc-500 shadow-sm",
           )}
         >
-          <TrendingUp className="w-3.5 h-3.5 text-zinc-500" />{" "}
-          Decentralized Fast Link Parser
+          <TrendingUp className="w-3.5 h-3.5 text-zinc-500" /> Decentralized
+          Fast Link Parser
         </div>
 
-        <h1 className={cn("text-2xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-2 leading-snug", textTitle)}>
+        <h1
+          className={cn(
+            "text-2xl sm:text-4xl font-extrabold tracking-tight mt-3 mb-2 leading-snug",
+            textTitle,
+          )}
+        >
           Extract Social Media Streams with Zero Compression
         </h1>
 
-        <p className={cn("text-xs sm:text-sm leading-relaxed max-w-xl", textSub)}>
+        <p
+          className={cn("text-xs sm:text-sm leading-relaxed max-w-xl", textSub)}
+        >
           Paste Instagram Reels, TikTok, YouTube Shorts, or Facebook URLs
-          directly. We connect straight to uncompressed CDNs to extract
-          clean raw formats.
+          directly. We connect straight to uncompressed CDNs to extract clean
+          raw formats.
         </p>
       </section>
 
@@ -75,7 +90,10 @@ export function VideoDownloader({
                 value={videoUrl}
                 onChange={onUrlChange}
                 placeholder="Paste your video, short, or reel link..."
-                className={cn("w-full text-xs sm:text-sm px-4 py-3.5 rounded-xl outline-none transition pr-28", inputBg)}
+                className={cn(
+                  "w-full text-xs sm:text-sm px-4 py-3.5 rounded-xl outline-none transition pr-28",
+                  inputBg,
+                )}
               />
               {detectedPlatform && (
                 <div
@@ -83,7 +101,7 @@ export function VideoDownloader({
                     "absolute right-2 top-2.5 text-[8px] uppercase font-mono tracking-wider px-2 py-1 rounded border",
                     isDark
                       ? "bg-zinc-900 border-zinc-800 text-zinc-400"
-                      : "bg-white border-zinc-250 text-zinc-500 shadow-sm"
+                      : "bg-white border-zinc-250 text-zinc-500 shadow-sm",
                   )}
                 >
                   {detectedPlatform}
@@ -96,18 +114,23 @@ export function VideoDownloader({
               disabled={isLoading}
               className={cn(
                 "font-bold px-6 py-3.5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition duration-150 disabled:opacity-50 shrink-0 shadow-sm",
-                btnPrimary
+                btnPrimary,
               )}
             >
               {isLoading ? (
                 <>
-                  <span className={cn("w-4 h-4 rounded-full border-2 border-t-transparent animate-spin", isDark ? "border-zinc-950" : "border-white")} />
+                  <span
+                    className={cn(
+                      "w-4 h-4 rounded-full border-2 border-t-transparent animate-spin",
+                      isDark ? "border-zinc-950" : "border-white",
+                    )}
+                  />
                   Extracting...
                 </>
               ) : (
                 <>
-                  <Download className="w-4 h-4 stroke-[2.5]" />
-                  Fetch Stream
+                  <Search className="w-4 h-4 stroke-[2.5]" />
+                  Search
                 </>
               )}
             </button>
@@ -119,7 +142,7 @@ export function VideoDownloader({
                 "flex items-center gap-2 text-xs p-3 rounded-lg border",
                 isDark
                   ? "bg-zinc-950 text-zinc-400 border-zinc-850"
-                  : "bg-red-50 text-red-700 border-red-100"
+                  : "bg-red-50 text-red-700 border-red-100",
               )}
             >
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -131,17 +154,34 @@ export function VideoDownloader({
         {isLoading && (
           <div className={cn("mt-4 p-4 rounded-xl border", innerCardBg)}>
             <div className="flex items-center justify-between text-[10px] sm:text-[11px] mb-2 font-mono">
-              <span className={cn("text-zinc-500 flex items-center gap-1.5 truncate")}>
+              <span
+                className={cn(
+                  "text-zinc-500 flex items-center gap-1.5 truncate",
+                )}
+              >
                 <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-ping" />
                 Connecting with Edge Delivery CDN Nodes...
               </span>
-              <span className={cn("font-bold shrink-0", isDark ? "text-zinc-300" : "text-zinc-700")}>
+              <span
+                className={cn(
+                  "font-bold shrink-0",
+                  isDark ? "text-zinc-300" : "text-zinc-700",
+                )}
+              >
                 {progress}%
               </span>
             </div>
-            <div className={cn("w-full h-[3px] rounded-full overflow-hidden", isDark ? "bg-zinc-900" : "bg-zinc-200")}>
+            <div
+              className={cn(
+                "w-full h-[3px] rounded-full overflow-hidden",
+                isDark ? "bg-zinc-900" : "bg-zinc-200",
+              )}
+            >
               <div
-                className={cn("h-full rounded-full transition-all duration-200", isDark ? "bg-zinc-300" : "bg-zinc-650")}
+                className={cn(
+                  "h-full rounded-full transition-all duration-200",
+                  isDark ? "bg-zinc-300" : "bg-zinc-650",
+                )}
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -151,7 +191,9 @@ export function VideoDownloader({
         <div
           className={cn(
             "flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-4 text-[9px] sm:text-[10px] font-mono pt-3 border-t",
-            isDark ? "border-zinc-850/60 text-zinc-550" : "border-zinc-100 text-zinc-500"
+            isDark
+              ? "border-zinc-850/60 text-zinc-550"
+              : "border-zinc-100 text-zinc-500",
           )}
         >
           <span className="flex items-center gap-1">

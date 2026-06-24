@@ -18,7 +18,11 @@ export type FormatSelectorProps = {
       isAudioAvailable: boolean;
     }[];
   } | null;
-  onDownload: (format: any, formatId: string, isAudioAvailable: boolean) => void;
+  onDownload: (
+    format: any,
+    formatId: string,
+    isAudioAvailable: boolean,
+  ) => void;
 };
 
 export function FormatSelector({
@@ -39,24 +43,34 @@ export function FormatSelector({
 
   if (!parsedVideo) return null;
 
+  // console.log("thumpnail in format selector", parsedVideo.thumbnail);
+
   return (
     <section
-      className={cn("border rounded-2xl overflow-hidden animate-fade-in", cardBg)}
+      className={cn(
+        "border rounded-2xl overflow-hidden animate-fade-in",
+        cardBg,
+      )}
     >
       <div
         className={cn(
           "px-4 py-3 border-b flex items-center justify-between gap-2",
-          isDark ? "bg-zinc-950 border-zinc-850" : "bg-zinc-50 border-zinc-200"
+          isDark ? "bg-zinc-950 border-zinc-850" : "bg-zinc-50 border-zinc-200",
         )}
       >
         <span
           className={cn(
             "text-[9px] sm:text-[10px] font-mono tracking-wider truncate",
-            isDark ? "text-zinc-400" : "text-zinc-600"
+            isDark ? "text-zinc-400" : "text-zinc-600",
           )}
         >
           Resolved node author:{" "}
-          <span className={cn(isDark ? "text-zinc-200" : "text-zinc-800", "font-semibold")}>
+          <span
+            className={cn(
+              isDark ? "text-zinc-200" : "text-zinc-800",
+              "font-semibold",
+            )}
+          >
             {parsedVideo.author}
           </span>
         </span>
@@ -69,16 +83,21 @@ export function FormatSelector({
               "relative aspect-video rounded-xl overflow-hidden border",
               isDark
                 ? "bg-zinc-950 border-zinc-850"
-                : "bg-zinc-100 border-zinc-250 shadow-sm"
+                : "bg-zinc-100 border-zinc-250 shadow-sm",
             )}
           >
             <img
-              src={parsedVideo.thumbnail}
+              src={
+                "https://instagram.fkhi28-1.fna.fbcdn.net/v/t51.71878-15/724320524_1669965580932698_5446939667017423434_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi42NDAuc2RyLnZpZGVvX25mcmFtZV9jb3Zlcl9mcmFtZS5jMiJ9&_nc_ht=instagram.fkhi28-1.fna.fbcdn.net&_nc_cat=102&_nc_oc=Q6cZ2gF4_vwbj6ic8iH1GFVxjP87C5htqxkEm3G7lVMDueME81kSnovWK2wlpwhXeQQ4ELk&_nc_ohc=Nc1-GvBhXxwQ7kNvwGcp1Wi&_nc_gid=9SDemH3nHaq3IbnH0N0iUg&edm=ANTKIIoBAAAA&ccb=7-5&oh=00_Af_WDhzW0JE1MJpDyn0XQbZNIX_mV4SjhR2dGtN9A5YOpw&oe=6A3CC0A4&_nc_sid=d885a2"
+              }
               alt="video preview"
-              className="w-full h-full object-cover opacity-80"
+              // // crossOrigin="use-credentials"
+              // fetchPriority="high"
+              // referrerPolicy="no-referrer"
+              className="w-full h-full object-cover"
             />
             <div className="absolute bottom-2 right-2 bg-zinc-950/90 border border-zinc-800 px-2 py-0.5 rounded text-[10px] font-mono text-zinc-300 shadow-sm">
-              {parsedVideo.duration}
+              {Number(parsedVideo.duration).toFixed(3)}
             </div>
           </div>
         </div>
@@ -87,7 +106,7 @@ export function FormatSelector({
           <h3
             className={cn(
               "text-[11px] sm:text-xs font-mono uppercase tracking-widest",
-              isDark ? "text-zinc-400" : "text-zinc-500"
+              isDark ? "text-zinc-400" : "text-zinc-500",
             )}
           >
             Select Available Quality:
@@ -101,12 +120,15 @@ export function FormatSelector({
                   "p-3 sm:p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition border",
                   isDark
                     ? "bg-zinc-950 border-zinc-850 hover:border-zinc-800"
-                    : "bg-zinc-50 border-zinc-200 hover:border-zinc-300 shadow-sm"
+                    : "bg-zinc-50 border-zinc-200 hover:border-zinc-300 shadow-sm",
                 )}
               >
                 <div className="min-w-0 flex-1">
                   <p
-                    className={cn("text-xs sm:text-sm font-bold truncate", textTitle)}
+                    className={cn(
+                      "text-xs sm:text-sm font-bold truncate",
+                      textTitle,
+                    )}
                   >
                     {format.quality}
                   </p>
@@ -121,16 +143,22 @@ export function FormatSelector({
                       "text-[9px] font-mono px-2 py-1 rounded border",
                       isDark
                         ? "bg-zinc-900 border-zinc-800 text-zinc-400"
-                        : "bg-white border-zinc-200 text-zinc-500 shadow-sm"
+                        : "bg-white border-zinc-200 text-zinc-500 shadow-sm",
                     )}
                   >
                     {format.size}
                   </span>
                   <button
-                    onClick={() => onDownload(format, parsedVideo.formats[idx].formatId, parsedVideo.formats[idx].isAudioAvailable)}
+                    onClick={() =>
+                      onDownload(
+                        format,
+                        parsedVideo.formats[idx].formatId,
+                        parsedVideo.formats[idx].isAudioAvailable,
+                      )
+                    }
                     className={cn(
                       "text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer",
-                      btnPrimary
+                      btnPrimary,
                     )}
                     title="Download to system"
                   >

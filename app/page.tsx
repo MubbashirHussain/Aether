@@ -23,7 +23,20 @@ import {
 
 import { FaInstagram, FaYoutube, FaFacebook } from "react-icons/fa";
 
-import { ThemeToggle, Notification, AdBanner, AdInspector, InterstitialAd, VideoDownloader, FormatSelector, VideoPlayer, DownloadHistory, PlatformSelector, FAQSection, HowToUseSection } from "@/components/ui";
+import {
+  ThemeToggle,
+  Notification,
+  AdBanner,
+  AdInspector,
+  InterstitialAd,
+  VideoDownloader,
+  FormatSelector,
+  VideoPlayer,
+  DownloadHistory,
+  PlatformSelector,
+  FAQSection,
+  HowToUseSection,
+} from "@/components/ui";
 import { PLATFORMS, FAQS, ADSENSE_CODE_TEMPLATES } from "@/lib/constants";
 import {
   analyzeUrl,
@@ -111,40 +124,47 @@ export default function App() {
 
   const [showInterstitial, setShowInterstitial] = useState<boolean>(false);
   const [interstitialTimer, setInterstitialTimer] = useState<number>(5);
-  const [pendingDownloadItem, setPendingDownloadItem] =
-    useState<ParsedVideo & { chosenQuality: string; chosenSize: string; formatId: string; isAudioAvailable: boolean } | null>(null);
+  const [pendingDownloadItem, setPendingDownloadItem] = useState<
+    | (ParsedVideo & {
+        chosenQuality: string;
+        chosenSize: string;
+        formatId: string;
+        isAudioAvailable: boolean;
+      })
+    | null
+  >(null);
 
   const [streamToken, setStreamToken] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [unlockAfter, setUnlockAfter] = useState<number>(0);
   const [countdown, setCountdown] = useState<number>(0);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("vdl_premium_history");
-    if (stored) {
-      try {
-        setDownloadHistory(JSON.parse(stored));
-      } catch (e) {
-        console.error("Local storage download history empty or read mismatch");
-      }
-    } else {
-      const initialSeed: DownloadHistoryItem[] = [
-        {
-          id: "seed-1",
-          title: "Premium luxury layout designs & minimalist spatial concepts",
-          platform: "instagram",
-          url: "https://instagram.com/reel/C8_sunset_bali/",
-          thumbnail:
-            "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=150&q=80",
-          timestamp: "Just now",
-          formatId: "0",
-          isAudioAvailable: true,
-        },
-      ];
-      setDownloadHistory(initialSeed);
-      localStorage.setItem("vdl_premium_history", JSON.stringify(initialSeed));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const stored = localStorage.getItem("vdl_premium_history");
+  //   if (stored) {
+  //     try {
+  //       setDownloadHistory(JSON.parse(stored));
+  //     } catch (e) {
+  //       console.error("Local storage download history empty or read mismatch");
+  //     }
+  //   } else {
+  //     const initialSeed: DownloadHistoryItem[] = [
+  //       {
+  //         id: "seed-1",
+  //         title: "Premium luxury layout designs & minimalist spatial concepts",
+  //         platform: "instagram",
+  //         url: "https://instagram.com/reel/C8_sunset_bali/",
+  //         thumbnail:
+  //           "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=150&q=80",
+  //         timestamp: "Just now",
+  //         formatId: "0",
+  //         isAudioAvailable: true,
+  //       },
+  //     ];
+  //     // setDownloadHistory(initialSeed);
+  //     // localStorage.setItem("vdl_premium_history", JSON.stringify(initialSeed));
+  //   }
+  // }, []);
 
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
@@ -156,7 +176,10 @@ export default function App() {
     );
   };
 
-  const triggerNotification = (message: string, type: "success" | "info" = "success") => {
+  const triggerNotification = (
+    message: string,
+    type: "success" | "info" = "success",
+  ) => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3500);
   };
@@ -211,15 +234,18 @@ export default function App() {
       setProgress(100);
       setIsLoading(false);
 
+      console.log(result.thumbnail);
       setParsedVideo({
         title: result.title,
         thumbnail: result.thumbnail,
-        duration: `${Math.floor(result.duration / 60)}:${(result.duration % 60).toString().padStart(2, '0')}`,
+        duration: `${Math.floor(result.duration / 60)}:${(result.duration % 60).toString().padStart(2, "0")}`,
         author: result.author,
         likes: "N/A",
         formats: result.formats.map((f, idx) => ({
           quality: f.quality || f.resolution,
-          size: f.filesize ? `${(f.filesize / 1024 / 1024).toFixed(2)} MB` : `${(f.filesize || 0).toLocaleString()} bytes`,
+          size: f.filesize
+            ? `${(f.filesize / 1024 / 1024).toFixed(2)} MB`
+            : `${(f.filesize || 0).toLocaleString()} bytes`,
           label: idx === 0 ? "Best Quality" : "Alternative",
           formatId: f.formatId,
           isAudioAvailable: f.isAudioAvailable,
@@ -249,7 +275,11 @@ export default function App() {
     return null;
   };
 
-  const handleStartSession = async (format: Format, formatId: string, isAudioAvailable: boolean) => {
+  const handleStartSession = async (
+    format: Format,
+    formatId: string,
+    isAudioAvailable: boolean,
+  ) => {
     if (!parsedVideo) return;
 
     try {
@@ -283,6 +313,7 @@ export default function App() {
         try {
           const unlocked = await unlockSession(session.sessionId);
           setStreamToken(unlocked.streamToken);
+          console.log("i am saving the stream Token", unlocked.streamToken);
           clearInterval(interval);
           triggerNotification("Download unlocked successfully!", "success");
         } catch (error: any) {
@@ -307,8 +338,10 @@ export default function App() {
   }, [showInterstitial, interstitialTimer]);
 
   const handleDownload = async () => {
+    console.log("on donwload clicked", pendingDownloadItem, streamToken);
     if (!pendingDownloadItem || !streamToken) return;
 
+    console.log("on donwload clicked", pendingDownloadItem, streamToken);
     try {
       setIsLoading(true);
 
@@ -316,13 +349,13 @@ export default function App() {
         await downloadFormat(
           pendingDownloadItem.originalUrl,
           pendingDownloadItem.formatId,
-          false
+          false,
         );
       } else {
         const blob = await downloadFormat(
           pendingDownloadItem.originalUrl,
           pendingDownloadItem.formatId,
-          true
+          true,
         );
         const url = URL.createObjectURL(blob);
         const element = document.createElement("a");
@@ -351,7 +384,10 @@ export default function App() {
       ].slice(0, 6);
 
       setDownloadHistory(updatedHistory);
-      localStorage.setItem("vdl_premium_history", JSON.stringify(updatedHistory));
+      localStorage.setItem(
+        "vdl_premium_history",
+        JSON.stringify(updatedHistory),
+      );
 
       setShowInterstitial(false);
       setPendingDownloadItem(null);
@@ -448,7 +484,7 @@ export default function App() {
       {showInterstitial && (
         <InterstitialAd
           isDark={isDark}
-          showInterstitial={showInterstitial}
+          showInterstitial={true}
           onClose={() => {
             setShowInterstitial(false);
             setPendingDownloadItem(null);
@@ -530,12 +566,12 @@ export default function App() {
 
       <main
         id="downloader-section"
-        className="max-w-6xl mx-auto px-4 py-6 sm:py-8 relative z-10"
+        className="flex flex-col gap-4 max-w-6xl mx-auto px-4 py-6 sm:py-8 relative z-10"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-4">
           <VideoDownloader
             isDark={isDark}
-            videoUrl={videoUrl}
+            videoUrl={"https://www.instagram.com/reels/DZpbvnZyJNM/"} // TODO remove this after test
             detectedPlatform={detectedPlatform}
             isLoading={isLoading}
             progress={progress}
@@ -544,7 +580,7 @@ export default function App() {
             onAnalyze={handleAnalyze}
           />
 
-          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 flex flex-1">
             <DownloadHistory
               isDark={isDark}
               downloadHistory={downloadHistory}

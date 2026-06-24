@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:4000";
+const API_BASE = "http://localhost:3000";
 
 interface FormatItem {
   formatId: string;
@@ -48,7 +48,9 @@ export async function analyzeUrl(url: string): Promise<SafeVideoMetadata> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => null);
-    throw new Error(err?.errors?.[0]?.message || `Analysis failed (${res.status})`);
+    throw new Error(
+      err?.errors?.[0]?.message || `Analysis failed (${res.status})`,
+    );
   }
 
   const json = await res.json();
@@ -69,7 +71,9 @@ export async function startSession(url: string): Promise<SessionResponse> {
   return res.json();
 }
 
-export async function unlockSession(sessionId: string): Promise<UnlockResponse> {
+export async function unlockSession(
+  sessionId: string,
+): Promise<UnlockResponse> {
   const res = await fetchAPI("/api/download/unlock", {
     method: "POST",
     body: JSON.stringify({ sessionId }),
@@ -80,7 +84,9 @@ export async function unlockSession(sessionId: string): Promise<UnlockResponse> 
     throw new Error(err?.message || `Unlock failed (${res.status})`);
   }
 
-  return res.json();
+  const jsonRes = await res.json();
+
+  return jsonRes.data;
 }
 
 export function getStreamUrl(streamToken: string, download = false): string {
@@ -91,7 +97,7 @@ export function getStreamUrl(streamToken: string, download = false): string {
 export async function downloadFormat(
   url: string,
   formatId: string,
-  isAudioAvailable = false
+  isAudioAvailable = false,
 ): Promise<Blob> {
   const res = await fetchAPI("/api/download/format", {
     method: "POST",
