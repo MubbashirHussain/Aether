@@ -38,6 +38,7 @@ import {
   HowToUseSection,
 } from "@/components/ui";
 import { PLATFORMS, FAQS, ADSENSE_CODE_TEMPLATES } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import {
   analyzeUrl,
   startSession,
@@ -45,6 +46,16 @@ import {
   getStreamUrl,
   downloadFormat,
 } from "@/lib/api";
+import {
+  initDownload,
+  waitForDownload,
+  downloadFile,
+  triggerDownload,
+  saveResumeState,
+  removeResumeState,
+  getResumeDownloads,
+  getResumeEntry,
+} from "@/lib/download-manager";
 
 type PlatformId = "all" | "instagram" | "tiktok" | "youtube" | "facebook";
 
@@ -138,6 +149,160 @@ export default function App() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [unlockAfter, setUnlockAfter] = useState<number>(0);
   const [countdown, setCountdown] = useState<number>(0);
+
+  // Download progress tracking
+  const [downloadProgress, setDownloadProgress] = useState<{
+    phase: "idle" | "ytdlp" | "file" | "completed" | "error";
+    downloadId: string | null;
+    ytdlpPercent: number;
+    filePercent: number;
+    speed: string;
+    eta: string;
+    transferred: string;
+    totalSize: string;
+    error?: string;
+  }>({
+    phase: "idle",
+    downloadId: null,
+    ytdlpPercent: 0,
+    filePercent: 0,
+    speed: "",
+    eta: "",
+    transferred: "0 B",
+    totalSize: "",
+  });
+
+  // Abort controller for cancelling file download
+  const [downloadAbortController, setDownloadAbortController] =
+    useState<AbortController | null>(null);
+
+  // Check for resume-able downloads on mount
+  const [resumeEntries, setResumeEntries] = useState<
+    { downloadId: string; url: string; platform: string; startedAt: number }[]
+  >([]);
+
+  useEffect(() => {
+    const entries = getResumeDownloads();
+    const valid: typeof resumeEntries = [];
+
+    const checks = entries.map(async (entry) => {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/download/format/status/${entry.downloadId}`,
+        );
+        const json = await res.json();
+        if (json.success && json.data.status === "completed") {
+          valid.push({
+            downloadId: entry.downloadId,
+            url: entry.url,
+            platform: entry.platform || "video",
+            startedAt: entry.startedAt,
+          });
+        } else {
+          removeResumeState(entry.downloadId);
+        }
+      } catch {
+        removeResumeState(entry.downloadId);
+      }
+    });
+
+    Promise.all(checks).then(() => {
+      setResumeEntries(valid);
+      if (valid.length > 0) {
+        triggerNotification(
+          `${valid.length} incomplete download${valid.length > 1 ? "s" : ""} available to resume.`,
+          "info",
+        );
+      }
+    });
+  }, []);
+
+  const handleResume = async (downloadId: string) => {
+    try {
+      const entry = getResumeEntry(downloadId);
+      if (!entry) {
+        triggerNotification("Download data not found.", "info");
+        return;
+      }
+
+      setIsLoading(true);
+      setDownloadProgress({
+        phase: "file",
+        downloadId,
+        ytdlpPercent: 100,
+        filePercent: 0,
+        speed: "",
+        eta: "",
+        transferred: "0 B",
+        totalSize: formatBytes(entry.totalSize),
+      });
+
+      const abortController = new AbortController();
+      setDownloadAbortController(abortController);
+
+      const blob = await downloadFile(
+        downloadId,
+        (fileProgress) => {
+          setDownloadProgress((prev) => ({
+            ...prev,
+            filePercent: fileProgress.percent,
+            transferred: formatBytes(fileProgress.transferred),
+            totalSize: formatBytes(fileProgress.total),
+          }));
+
+          if (fileProgress.percent % 5 === 0 && fileProgress.percent > 0) {
+            saveResumeState({
+              ...entry,
+              downloadedBytes: fileProgress.transferred,
+              startedAt: Date.now(),
+            });
+          }
+        },
+        abortController.signal,
+        entry.downloadedBytes || 0,
+      );
+
+      setDownloadProgress((prev) => ({ ...prev, phase: "completed" }));
+
+      const ext = blob.type.includes("mp4")
+        ? "mp4"
+        : blob.type.includes("webm")
+          ? "webm"
+          : "mp4";
+      triggerDownload(blob, `resumed_video_${Date.now()}.${ext}`);
+
+      removeResumeState(downloadId);
+      setResumeEntries((prev) =>
+        prev.filter((e) => e.downloadId !== downloadId),
+      );
+
+      triggerNotification("Download resumed successfully!", "success");
+    } catch (error: any) {
+      // If the file expired on the server, remove resume state
+      if (
+        error.message?.includes("404") ||
+        error.message?.includes("not found")
+      ) {
+        removeResumeState(downloadId);
+        setResumeEntries((prev) =>
+          prev.filter((e) => e.downloadId !== downloadId),
+        );
+        triggerNotification(
+          "Download expired on server. Please start again.",
+          "info",
+        );
+      } else {
+        setDownloadProgress((prev) => ({
+          ...prev,
+          phase: "error",
+          error: error.message,
+        }));
+      }
+    } finally {
+      setIsLoading(false);
+      setDownloadAbortController(null);
+    }
+  };
 
   // useEffect(() => {
   //   const stored = localStorage.getItem("vdl_premium_history");
@@ -338,34 +503,107 @@ export default function App() {
   }, [showInterstitial, interstitialTimer]);
 
   const handleDownload = async () => {
-    console.log("on donwload clicked", pendingDownloadItem, streamToken);
-    if (!pendingDownloadItem || !streamToken) return;
+    console.log("on download clicked", pendingDownloadItem, streamToken);
+    if (!pendingDownloadItem) return;
 
-    console.log("on donwload clicked", pendingDownloadItem, streamToken);
+    // Close InterstitialAd immediately so user can see the progress bar
+    setShowInterstitial(false);
+
     try {
       setIsLoading(true);
 
-      if (!pendingDownloadItem.isAudioAvailable) {
-        await downloadFormat(
-          pendingDownloadItem.originalUrl,
-          pendingDownloadItem.formatId,
-          false,
-        );
-      } else {
-        const blob = await downloadFormat(
-          pendingDownloadItem.originalUrl,
-          pendingDownloadItem.formatId,
-          true,
-        );
-        const url = URL.createObjectURL(blob);
-        const element = document.createElement("a");
-        element.href = url;
-        element.download = `${pendingDownloadItem.platform}_video_${Date.now()}.mp4`;
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
-        URL.revokeObjectURL(url);
-      }
+      // ── Phase 1: Initiate yt-dlp download on server ──
+      setDownloadProgress({
+        phase: "ytdlp",
+        downloadId: null,
+        ytdlpPercent: 0,
+        filePercent: 0,
+        speed: "",
+        eta: "",
+        transferred: "0 B",
+        totalSize: "",
+      });
+
+      const downloadId = await initDownload(
+        pendingDownloadItem.originalUrl,
+        pendingDownloadItem.formatId,
+        pendingDownloadItem.isAudioAvailable,
+      );
+
+      setDownloadProgress((prev) => ({ ...prev, downloadId }));
+
+      // ── Phase 2: Subscribe to yt-dlp progress via SSE ──
+      await waitForDownload(downloadId, (progress) => {
+        setDownloadProgress((prev) => ({
+          ...prev,
+          phase:
+            progress.status === "error"
+              ? "error"
+              : progress.status === "completed"
+                ? "file"
+                : "ytdlp",
+          ytdlpPercent: progress.percent,
+          speed: progress.speed,
+          eta: progress.eta,
+          totalSize: formatBytes(progress.totalSize),
+          error: progress.error,
+        }));
+      });
+
+      // ── Phase 3: Download the file from server with byte progress ──
+      const abortController = new AbortController();
+      setDownloadAbortController(abortController);
+
+      setDownloadProgress((prev) => ({
+        ...prev,
+        phase: "file",
+        filePercent: 0,
+      }));
+
+      const blob = await downloadFile(
+        downloadId,
+        (fileProgress) => {
+          setDownloadProgress((prev) => ({
+            ...prev,
+            filePercent: fileProgress.percent,
+            transferred: formatBytes(fileProgress.transferred),
+            totalSize: formatBytes(fileProgress.total),
+            speed: fileProgress.percent > 0 ? `${fileProgress.percent}%` : "",
+          }));
+
+          // Save resume state periodically (every 5%)
+          if (fileProgress.percent % 5 === 0 && fileProgress.percent > 0) {
+            saveResumeState({
+              downloadId,
+              downloadedBytes: fileProgress.transferred,
+              totalSize: fileProgress.total,
+              url: pendingDownloadItem.originalUrl,
+              formatId: pendingDownloadItem.formatId,
+              isAudioAvailable: pendingDownloadItem.isAudioAvailable,
+              platform: pendingDownloadItem.platform,
+              startedAt: Date.now(),
+            });
+          }
+        },
+        abortController.signal,
+        0,
+      );
+
+      // ── Phase 4: Done — save file and update history ──
+      setDownloadProgress((prev) => ({ ...prev, phase: "completed" }));
+
+      const ext = blob.type.includes("mp4")
+        ? "mp4"
+        : blob.type.includes("webm")
+          ? "webm"
+          : "mp4";
+      triggerDownload(
+        blob,
+        `${pendingDownloadItem.platform}_video_${Date.now()}.${ext}`,
+      );
+
+      // Clear resume state since download succeeded
+      removeResumeState(downloadId);
 
       const updatedHistory: DownloadHistoryItem[] = [
         {
@@ -399,9 +637,24 @@ export default function App() {
       );
     } catch (error: any) {
       setErrorMessage(error.message || "Failed to download video");
+      setDownloadProgress((prev) => ({
+        ...prev,
+        phase: "error",
+        error: error.message,
+      }));
     } finally {
       setIsLoading(false);
+      setDownloadAbortController(null);
     }
+  };
+
+  /** Helper: format bytes to human-readable string */
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
   };
 
   const handleCopyHistory = (url: string, index: number) => {
@@ -592,6 +845,93 @@ export default function App() {
           </div>
         </div>
 
+        {/* Resume banner for interrupted downloads */}
+        {resumeEntries.length > 0 && (
+          <section
+            className={cn(
+              "rounded-2xl p-4 border",
+              isDark
+                ? "bg-amber-950/20 border-amber-500/30"
+                : "bg-amber-50 border-amber-400/60",
+            )}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3
+                className={cn(
+                  "text-xs font-bold font-mono",
+                  isDark ? "text-amber-300" : "text-amber-800",
+                )}
+              >
+                ⚡ Resume Incomplete Downloads
+              </h3>
+              <button
+                onClick={() => {
+                  resumeEntries.forEach((e) => removeResumeState(e.downloadId));
+                  setResumeEntries([]);
+                  triggerNotification("Cleared resume entries.", "info");
+                }}
+                className={cn(
+                  "text-[9px] font-mono px-2 py-1 rounded border transition",
+                  isDark
+                    ? "border-zinc-800 text-zinc-400 hover:text-zinc-200"
+                    : "border-zinc-200 text-zinc-500 hover:text-zinc-700",
+                )}
+              >
+                Clear All
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              {resumeEntries.map((entry) => (
+                <div
+                  key={entry.downloadId}
+                  className={cn(
+                    "flex items-center justify-between gap-3 p-3 rounded-xl border text-[11px]",
+                    isDark
+                      ? "bg-zinc-900 border-zinc-800"
+                      : "bg-white border-zinc-200",
+                  )}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={cn(
+                        "truncate font-medium",
+                        isDark ? "text-zinc-200" : "text-zinc-800",
+                      )}
+                    >
+                      {entry.url.split("/").pop()?.slice(0, 40) || "Video"}
+                    </p>
+                    <p
+                      className={cn(
+                        "text-[9px] font-mono mt-0.5",
+                        isDark ? "text-zinc-500" : "text-zinc-400",
+                      )}
+                    >
+                      {entry.platform} •{" "}
+                      {new Date(entry.startedAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleResume(entry.downloadId)}
+                    disabled={isLoading}
+                    className={cn(
+                      "shrink-0 text-[10px] font-bold px-4 py-2 rounded-lg transition flex items-center gap-1.5",
+                      isDark
+                        ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                        : "bg-emerald-600 hover:bg-emerald-500 text-white",
+                    )}
+                  >
+                    {isLoading ? (
+                      <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin" />
+                    ) : (
+                      "Resume"
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {parsedVideo && !streamToken && (
           <FormatSelector
             isDark={isDark}
@@ -614,6 +954,21 @@ export default function App() {
             }}
             onDownload={handleDownload}
             isLoading={isLoading}
+            downloadProgress={downloadProgress}
+            onCancelDownload={() => {
+              downloadAbortController?.abort();
+              setDownloadProgress({
+                phase: "idle",
+                downloadId: null,
+                ytdlpPercent: 0,
+                filePercent: 0,
+                speed: "",
+                eta: "",
+                transferred: "0 B",
+                totalSize: "",
+              });
+              triggerNotification("Download cancelled", "info");
+            }}
           />
         )}
 
