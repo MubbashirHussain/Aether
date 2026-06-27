@@ -2,6 +2,7 @@
 
 import { Download, ExternalLink, X, Sparkles, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AdSenseSlot } from "./adsense-slot";
 
 export type InterstitialAdProps = {
   isDark: boolean;
@@ -14,6 +15,8 @@ export type InterstitialAdProps = {
   } | null;
   countdown: number;
   onDownload: () => void;
+  clientId: string;
+  slotId?: string;
 };
 
 export function InterstitialAd({
@@ -23,6 +26,8 @@ export function InterstitialAd({
   pendingDownloadItem,
   countdown,
   onDownload,
+  clientId,
+  slotId = "3456789012",
 }: InterstitialAdProps) {
   const cardBg = isDark
     ? "bg-zinc-900 border-zinc-800 text-zinc-200"
@@ -80,39 +85,22 @@ export function InterstitialAd({
             <span className="bg-amber-500/10 text-amber-500 px-1.5 py-0.5 rounded">
               AdSense Vignette Placement
             </span>
-            <span>id: ca-pub-adsense-interstitial</span>
+            <span>slot: {slotId}</span>
           </div>
 
           <div
             className={cn(
-              "min-h-[140px] border rounded-lg flex flex-col items-center justify-center p-4 text-center",
+              "min-h-[140px] border rounded-lg flex flex-col items-center justify-center p-4 text-center overflow-hidden",
               innerCardBg
             )}
           >
-            <div className="w-10 h-10 rounded-full bg-zinc-50/10 flex items-center justify-center text-amber-400 mb-2 border border-zinc-200/10">
-              <DollarSign className="w-5 h-5 animate-pulse" />
+            <div className="w-full flex justify-center py-2">
+              <AdSenseSlot
+                clientId={clientId}
+                slotId={slotId}
+                format="rectangle, horizontal"
+              />
             </div>
-            <p className={cn("text-xs font-semibold", textTitle)}>
-              Scale Globally with Supabase Database Services
-            </p>
-            <p className={cn("text-[10px] mt-1.5 max-w-xs leading-normal", textSub)}>
-              Host user profiles, save global media histories, and sync
-              cross-platform structures inside standard PostgreSQL nodes.
-            </p>
-            <a
-              href="https://google.com"
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => window.dispatchEvent(new CustomEvent("trigger-notification", { detail: { message: "Redirecting safely to secure advertiser site...", type: "info" } }))}
-              className={cn(
-                "mt-3.5 text-[10px] px-3 py-1.5 rounded-lg border transition inline-flex items-center gap-1.5 font-semibold",
-                isDark
-                  ? "bg-zinc-800 hover:bg-zinc-755 border-zinc-700 text-zinc-300"
-                  : "bg-zinc-100 hover:bg-zinc-200 border-zinc-250 text-zinc-700"
-              )}
-            >
-              Visit Sponsor Website <ExternalLink className="w-3 h-3" />
-            </a>
           </div>
         </div>
 

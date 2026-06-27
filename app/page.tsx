@@ -36,6 +36,7 @@ import {
   PlatformSelector,
   FAQSection,
   HowToUseSection,
+  AdSenseSlot,
 } from "@/components/ui";
 import { PLATFORMS, FAQS, ADSENSE_CODE_TEMPLATES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -56,6 +57,7 @@ import {
   getResumeDownloads,
   getResumeEntry,
 } from "@/lib/download-manager";
+import { useAdConfig } from "@/config/zustand";
 
 type PlatformId = "all" | "instagram" | "tiktok" | "youtube" | "facebook";
 
@@ -100,6 +102,36 @@ interface DownloadHistoryItem {
 
 export default function App() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  const { adsenseClientId, topBannerSlotId, bottomAnchorSlotId } =
+    useAdConfig();
+  useEffect(() => {
+    if (typeof window !== "undefined" && adsenseClientId) {
+      const existingScript = document.querySelector(
+        'script[src*="pagead2.googlesyndication.com"]',
+      );
+      if (existingScript) {
+        existingScript.remove();
+      }
+
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`;
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    }
+  }, [adsenseClientId]);
+
+  const computedAdTemplates = React.useMemo(() => {
+    const templates: Record<string, string> = {};
+    for (const [key, value] of Object.entries(ADSENSE_CODE_TEMPLATES)) {
+      templates[key] = value.replaceAll(
+        "ca-pub-XXXXXXXXXXXXX",
+        adsenseClientId,
+      );
+    }
+    return templates;
+  }, [adsenseClientId]);
 
   useEffect(() => {
     const saved = localStorage.getItem("vdl_theme");
@@ -188,7 +220,7 @@ export default function App() {
     const checks = entries.map(async (entry) => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/download/format/status/${entry.downloadId}`,
+          `${process.env.NEXT_BACKEND_PUBLIC_API_URL}/api/download/format/status/${entry.downloadId}`,
         );
         const json = await res.json();
         if (json.success && json.data.status === "completed") {
@@ -335,10 +367,6 @@ export default function App() {
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
     localStorage.setItem("vdl_theme", nextTheme);
-    triggerNotification(
-      `Switched to ${nextTheme === "dark" ? "Dark Mode" : "Light Mode"}`,
-      "info",
-    );
   };
 
   const triggerNotification = (
@@ -681,7 +709,7 @@ export default function App() {
   };
 
   const handleCopyCode = () => {
-    navigator.clipboard.writeText(ADSENSE_CODE_TEMPLATES[selectedAdForCode]);
+    navigator.clipboard.writeText(computedAdTemplates[selectedAdForCode]);
     triggerNotification("AdSense responsive code copied!", "success");
   };
 
@@ -746,6 +774,7 @@ export default function App() {
           pendingDownloadItem={pendingDownloadItem}
           countdown={countdown}
           onDownload={handleDownload}
+          clientId={adsenseClientId}
         />
       )}
 
@@ -789,7 +818,7 @@ export default function App() {
 
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
-            <button
+            {/* <button
               onClick={() => {
                 setShowAdInspector(!showAdInspector);
                 triggerNotification(
@@ -806,7 +835,7 @@ export default function App() {
             >
               <Settings className="w-3.5 h-3.5 text-amber-500" />
               <span className="hidden sm:inline">Ad Settings</span>
-            </button>
+            </button> */}
           </div>
         </div>
       </header>
@@ -815,6 +844,7 @@ export default function App() {
         isDark={isDark}
         highlightAds={highlightAds}
         onHighlightToggle={() => setHighlightAds(!highlightAds)}
+        clientId={adsenseClientId}
       />
 
       <main
@@ -990,13 +1020,13 @@ export default function App() {
               : "bg-white/95 border-zinc-200"
           }`}
         >
-          <div className="max-w-5xl mx-auto px-4 flex items-center justify-between gap-4 relative">
+          <div className="max-w-5xl mx-auto px-4 relative flex flex-col items-center">
             <button
               onClick={() => {
                 setShowStickyBottomAd(false);
                 triggerNotification("Bottom anchor ad dismissed.", "info");
               }}
-              className={`absolute -top-3.5 right-4 border text-[9px] font-mono flex items-center gap-1 cursor-pointer p-1 rounded-full shadow-md ${
+              className={`absolute -top-3.5 right-4 border text-[9px] font-mono flex items-center gap-1 cursor-pointer p-1 rounded-full shadow-md z-50 ${
                 isDark
                   ? "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
                   : "bg-white border-zinc-200 text-zinc-500 hover:text-zinc-800"
@@ -1007,58 +1037,53 @@ export default function App() {
             </button>
 
             <div
-              className={`w-full rounded-lg p-2.5 flex flex-col md:flex-row items-center justify-between gap-3 ${
+              className={cn(
+                "w-full rounded-lg p-2 flex flex-col items-center justify-center relative overflow-hidden transition-all",
                 highlightAds
                   ? isDark
-                    ? "bg-amber-950/15 border border-dashed border-amber-500/50"
-                    : "bg-amber-50/70 border border-dashed border-amber-400/55"
-                  : isDark
-                    ? "bg-zinc-900"
-                    : "bg-zinc-50"
-              }`}
+                    ? "bg-amber-950/15 border border-dashed border-amber-500/50 pt-6"
+                    : "bg-amber-50/70 border border-dashed border-amber-400/55 pt-6"
+                  : "min-h-[90px]",
+              )}
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <span
-                  className={`text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded shrink-0 ${
+              {highlightAds && (
+                <div
+                  className={cn(
+                    "absolute top-0 left-0 right-0 border-b px-3 py-1 flex items-center justify-between text-[8px] sm:text-[9px] font-mono",
                     isDark
-                      ? "bg-amber-500/20 text-amber-300"
-                      : "bg-amber-100 text-amber-800"
-                  }`}
+                      ? "bg-amber-500/10 border-amber-500/20 text-amber-300"
+                      : "bg-amber-50 border-amber-200 text-amber-800",
+                  )}
                 >
-                  AdSense Anchor
-                </span>
-                <p
-                  className={`text-[11px] truncate font-mono ${isDark ? "text-zinc-300" : "text-zinc-600"}`}
-                >
-                  {highlightAds
-                    ? "👉 Sticky Bottom Ad Zone (Universal mobile layout anchor - highly conversion efficient)"
-                    : "Sponsor: Clean Postgres storage, user auth, and real-time APIs using Supabase."}
-                </p>
-              </div>
+                  <span className="flex items-center gap-1 truncate">
+                    <strong>
+                      Google AdSense Spot: Bottom Anchor banner [5678901234]
+                    </strong>
+                  </span>
+                  <span className="bg-amber-500 text-zinc-950 px-1 rounded font-bold uppercase text-[7px] tracking-wider shrink-0">
+                    Anchor Unit
+                  </span>
+                </div>
+              )}
 
-              <div className="flex items-center gap-3 shrink-0">
-                <span className="text-[9px] font-mono text-zinc-550 hidden md:inline">
-                  Ideal mobile placement
-                </span>
-                <a
-                  href="https://google.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`font-bold px-3 py-1 text-[10px] rounded-lg transition uppercase tracking-wider shadow-sm ${
-                    isDark
-                      ? "bg-zinc-100 hover:bg-white text-zinc-950"
-                      : "bg-zinc-900 hover:bg-zinc-855 text-white"
-                  }`}
-                >
-                  Visit site
-                </a>
+              <div className="w-full flex justify-center">
+                <AdSenseSlot
+                  clientId={adsenseClientId}
+                  slotId="5678901234"
+                  format="horizontal"
+                  style={{
+                    display: "inline-block",
+                    width: "100%",
+                    height: "90px",
+                  }}
+                />
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {showAdInspector && (
+      {/* {showAdInspector && (
         <AdInspector
           isDark={isDark}
           showAdInspector={showAdInspector}
@@ -1069,10 +1094,12 @@ export default function App() {
           onTabChange={setActiveInspectorTab}
           selectedAdForCode={selectedAdForCode}
           onAdSelect={setSelectedAdForCode}
-          adTemplates={ADSENSE_CODE_TEMPLATES}
+          adTemplates={computedAdTemplates}
           onCopyCode={handleCopyCode}
+          clientId={adsenseClientId}
+          onClientIdChange={setAdConfig}
         />
-      )}
+      )} */}
 
       <footer
         className={`border-t py-8 relative z-10 ${isDark ? "bg-zinc-950 border-zinc-900" : "bg-white border-zinc-200"}`}

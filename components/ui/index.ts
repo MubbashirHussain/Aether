@@ -10,3 +10,4 @@ export { DownloadHistory } from "./download-history";
 export { PlatformSelector } from "./platform-selector";
 export { FAQSection } from "./faq-section";
 export { HowToUseSection } from "./how-to-use-section";
+export { AdSenseSlot } from "./adsense-slot";
