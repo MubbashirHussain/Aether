@@ -1011,7 +1011,7 @@ export default function App() {
         <div
           className={`fixed bottom-0 left-0 right-0 z-40 border-t py-3.5 backdrop-blur-md transition-colors duration-300 shadow-[0_-8px_30px_rgba(0,0,0,0.4)] ${
             isDark
-              ? "bg-zinc-950/95 border-zinc-850"
+              ? "bg-zinc-950/95 border-zinc-800"
               : "bg-white/95 border-zinc-200"
           }`}
         >
@@ -1021,7 +1021,7 @@ export default function App() {
                 setShowStickyBottomAd(false);
                 triggerNotification("Bottom anchor ad dismissed.", "info");
               }}
-              className={`absolute -top-3.5 right-4 border text-[9px] font-mono flex items-center gap-1 cursor-pointer p-1 rounded-full shadow-md z-50 ${
+              className={`absolute -top-7.5 right-4 border text-[9px] font-mono flex items-center gap-1 cursor-pointer p-1 rounded-full shadow-md z-50 ${
                 isDark
                   ? "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white"
                   : "bg-white border-zinc-200 text-zinc-500 hover:text-zinc-800"
@@ -1031,7 +1031,7 @@ export default function App() {
               <X className="w-3 h-3" /> Close Ad
             </button>
 
-            <div
+            {/* <div
               className={cn(
                 "w-full rounded-lg p-2 flex flex-col items-center justify-center relative overflow-hidden transition-all",
                 highlightAds
@@ -1059,9 +1059,9 @@ export default function App() {
                     Anchor Unit
                   </span>
                 </div>
-              )}
+              )} */}
 
-              <div className="w-full flex justify-center">
+              <div className="w-full flex justify-center border rounded-lg overflow-hidden transition-all">
                 <AdSenseSlot
                   clientId={adsenseClientId}
                   slotId="5678901234"
@@ -1074,7 +1074,7 @@ export default function App() {
                 />
               </div>
             </div>
-          </div>
+          {/* </div> */}
         </div>
       )}
 
