@@ -22,8 +22,8 @@ export function AdBanner({
   const textMuted = isDark ? "text-zinc-500" : "text-zinc-400";
 
   return (
-    <div className="max-w-6xl mx-auto px-4 mt-4">
-      <div
+    <div className="max-w-6xl mx-auto px-4 mt-4 border rounded-lg shadow-sm overflow-hidden">
+      {/* <div
         className={cn(
           "relative rounded-xl border transition-all overflow-hidden",
           highlightAds
@@ -64,13 +64,13 @@ export function AdBanner({
             className={`text-[9px] font-mono tracking-widest uppercase mb-2 ${textMuted}`}
           >
             Advertisement
-          </span>
+          </span> */}
 
           <div className="w-full max-w-4xl flex justify-center">
             <AdSenseSlot clientId={clientId} slotId={slotId} format="auto" />
           </div>
         </div>
-      </div>
-    </div>
+    //   </div>
+    // </div>
   );
 }

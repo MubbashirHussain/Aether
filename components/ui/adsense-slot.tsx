@@ -2,39 +2,47 @@
 
 import React, { useEffect, useRef } from "react";
 
+// 1. CONFIGURATION: Set your global client ID here or via environment variable.
+// Replace 'ca-pub-XXXXXXXXXXXXXXXX' with your actual publisher ID.
+const DEFAULT_CLIENT_ID =
+  process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-XXXXXXXXXXXXXXXX";
+
 export type AdSenseSlotProps = {
-  clientId: string;
   slotId: string;
+  clientId?: string; // Optional: Defaults to the global ID if not provided
   format?: string;
   responsive?: boolean;
   layout?: string;
   style?: React.CSSProperties;
 };
 
+/**
+ * AdSenseSlot component
+ * Usage: <AdSenseSlot slotId="1234567890" />
+ */
 export function AdSenseSlot({
-  clientId,
   slotId,
+  clientId = DEFAULT_CLIENT_ID,
   format = "auto",
   responsive = true,
   layout,
-  style = { display: "block" },
+  style = { display: "block", minHeight: "100px", width: "100%" },
 }: AdSenseSlotProps) {
   const initialized = useRef(false);
 
   useEffect(() => {
-    // Avoid double initialization (particularly in React StrictMode)
+    // Only attempt to push if the script is loaded
     if (initialized.current) return;
 
-    if (typeof window !== "undefined") {
-      try {
-        const adsbygoogle = (window as any).adsbygoogle || [];
-        adsbygoogle.push({});
+    try {
+      if (typeof window !== "undefined" && (window as any).adsbygoogle) {
+        (window as any).adsbygoogle.push({});
         initialized.current = true;
-      } catch (err) {
-        console.error("AdSense slot initialization error:", err);
       }
+    } catch (err) {
+      console.error("AdSense slot initialization error:", err);
     }
-  }, [clientId, slotId]); // Remounting triggers this if client or slot changes
+  }, []);
 
   return (
     <ins

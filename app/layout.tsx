@@ -29,7 +29,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <AdsenseScript adId={process.env.NEXT_PUBLIC_ADSENSE_ID!} />
+        <AdsenseScript adId={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID!} />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

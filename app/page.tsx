@@ -1,33 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Download,
-  Video,
-  History,
-  Settings,
-  Copy,
-  Check,
-  ExternalLink,
-  AlertCircle,
-  X,
-  Flame,
-  TrendingUp,
-  Sliders,
-  Smartphone,
-  Laptop,
-  Sun,
-  Moon,
-  ShieldCheck,
-} from "lucide-react";
-
-import { FaInstagram, FaYoutube, FaFacebook } from "react-icons/fa";
+import { Video, X } from "lucide-react";
 
 import {
   ThemeToggle,
   Notification,
   AdBanner,
-  AdInspector,
   InterstitialAd,
   VideoDownloader,
   FormatSelector,
@@ -58,6 +37,7 @@ import {
   getResumeEntry,
 } from "@/lib/download-manager";
 import { useAdConfig } from "@/config/zustand";
+import Footer from "@/components/ui/Footer";
 
 type PlatformId = "all" | "instagram" | "tiktok" | "youtube" | "facebook";
 
@@ -103,7 +83,7 @@ interface DownloadHistoryItem {
 export default function App() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
-  const { adsenseClientId, topBannerSlotId, bottomAnchorSlotId } =
+  const { adsenseClientId, topBannerSlotId, sidebarSlotId, bottomAnchorSlotId } =
     useAdConfig();
   useEffect(() => {
     if (typeof window !== "undefined" && adsenseClientId) {
@@ -747,7 +727,11 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen ${rootBg} font-sans antialiased relative pb-32 sm:pb-28 transition-colors duration-300`}
+      className={cn(`min-h-screen ${rootBg} font-sans antialiased relative transition-all duration-300`,
+        showStickyBottomAd
+          ? "pb-32 sm:pb-36"
+          : "pb-12 sm:pb-16"
+      )}
     >
       <div
         className={`absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] bg-gradient-to-b ${glowGradient} via-transparent to-transparent pointer-events-none z-0`}
@@ -762,7 +746,7 @@ export default function App() {
         />
       )}
 
-      {showInterstitial && (
+     {/* {showInterstitial && (
         <InterstitialAd
           isDark={isDark}
           showInterstitial={true}
@@ -776,7 +760,7 @@ export default function App() {
           onDownload={handleDownload}
           clientId={adsenseClientId}
         />
-      )}
+      )}}*/}
 
       <header
         className={`sticky top-0 z-40 backdrop-blur-md border-b ${headerBg} transition-colors duration-300`}
@@ -845,6 +829,7 @@ export default function App() {
         highlightAds={highlightAds}
         onHighlightToggle={() => setHighlightAds(!highlightAds)}
         clientId={adsenseClientId}
+        slotId={topBannerSlotId}
       />
 
       <main
@@ -854,7 +839,7 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-4">
           <VideoDownloader
             isDark={isDark}
-            videoUrl={"https://www.instagram.com/reels/DZpbvnZyJNM/"} // TODO remove this after test
+            videoUrl={videoUrl} // TODO remove this after test
             detectedPlatform={detectedPlatform}
             isLoading={isLoading}
             progress={progress}
@@ -863,15 +848,25 @@ export default function App() {
             onAnalyze={handleAnalyze}
           />
 
-          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 flex flex-1">
-            <DownloadHistory
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 flex flex-1 border rounded-2xl p-4 sm:p-6 lg:p-4 xl:p-6 transition-colors duration-300">
+            <AdSenseSlot
+              slotId={sidebarSlotId}
+              format="auto"
+                responsive={true}
+                  style={{
+                    display: "inline-block",
+                    width: "100%",
+                    height: "100%",
+                  }}
+            />
+            {/* <DownloadHistory
               isDark={isDark}
               downloadHistory={downloadHistory}
               onCopyHistory={handleCopyHistory}
               onReFetch={handleReFetch}
               onClearHistory={clearHistory}
               copiedIndex={copiedIndex}
-            />
+            /> */}
           </div>
         </div>
 
@@ -1101,62 +1096,7 @@ export default function App() {
         />
       )} */}
 
-      <footer
-        className={`border-t py-8 relative z-10 ${isDark ? "bg-zinc-950 border-zinc-900" : "bg-white border-zinc-200"}`}
-      >
-        <div className="max-w-6xl mx-auto px-4 text-center space-y-6">
-          <div
-            className={`flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b ${
-              isDark ? "border-zinc-900" : "border-zinc-200"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <div
-                className={`w-6 h-6 rounded flex items-center justify-center shrink-0 ${
-                  isDark
-                    ? "bg-zinc-100 text-zinc-950"
-                    : "bg-zinc-900 text-white"
-                }`}
-              >
-                <Video className="w-3.5 h-3.5 stroke-[2]" />
-              </div>
-              <span
-                className={`text-xs font-bold ${isDark ? "text-zinc-100" : "text-zinc-900"}`}
-              >
-                Aether Downloader Studio
-              </span>
-            </div>
-
-            <p className="text-[10px] text-zinc-550 max-w-sm text-center sm:text-right leading-relaxed font-mono">
-              Independent utility platform. Not affiliated with Instagram,
-              TikTok, YouTube, or Facebook. No media assets are hosted locally
-              on our nodes.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5 text-[10px] text-zinc-500 font-mono">
-            <a href="#" className="hover:text-zinc-300 transition">
-              Terms & Service
-            </a>
-            <a href="#" className="hover:text-zinc-300 transition">
-              Privacy Settings
-            </a>
-            <a href="#" className="hover:text-zinc-300 transition">
-              Cookie Settings
-            </a>
-            <a href="#" className="hover:text-zinc-300 transition">
-              Contact Webmaster
-            </a>
-          </div>
-
-          <div className="text-[9px] text-zinc-500 font-mono">
-            <p>
-              © {new Date().getFullYear()} Aether Downloader. Engineered for
-              hyper-speed downloads and clean monetization.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer isDark={isDark} />
     </div>
   );
 }

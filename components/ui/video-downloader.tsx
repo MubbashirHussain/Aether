@@ -91,22 +91,10 @@ export function VideoDownloader({
                 onChange={onUrlChange}
                 placeholder="Paste your video, short, or reel link..."
                 className={cn(
-                  "w-full text-xs sm:text-sm px-4 py-3.5 rounded-xl outline-none transition pr-28",
+                  "w-full text-xs sm:text-sm px-4 py-3.5 rounded-xl outline-none transition",
                   inputBg,
                 )}
               />
-              {detectedPlatform && (
-                <div
-                  className={cn(
-                    "absolute right-2 top-2.5 text-[8px] uppercase font-mono tracking-wider px-2 py-1 rounded border",
-                    isDark
-                      ? "bg-zinc-900 border-zinc-800 text-zinc-400"
-                      : "bg-white border-zinc-250 text-zinc-500 shadow-sm",
-                  )}
-                >
-                  {detectedPlatform}
-                </div>
-              )}
             </div>
 
             <button
@@ -130,7 +118,7 @@ export function VideoDownloader({
               ) : (
                 <>
                   <Search className="w-4 h-4 stroke-[2.5]" />
-                  Search
+                  Search {detectedPlatform}
                 </>
               )}
             </button>
