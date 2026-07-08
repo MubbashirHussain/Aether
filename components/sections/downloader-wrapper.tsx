@@ -121,7 +121,7 @@ export default function DownloaderWrapper() {
   >("overview");
   const [selectedAdForCode, setSelectedAdForCode] =
     useState<string>("leaderboard");
-  const [showStickyBottomAd, setShowStickyBottomAd] = useState<boolean>(true);
+  const { setShowStickyBottomAd, showStickyBottomAd } = useTheme();
 
   const [showInterstitial, setShowInterstitial] = useState<boolean>(false);
   const [pendingDownloadItem, setPendingDownloadItem] = useState<

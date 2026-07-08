@@ -58,6 +58,8 @@ export function useTheme() {
     theme: context.theme,
     isDark: context.isDark,
     toggleTheme: context.toggleTheme,
+    setShowStickyBottomAd: context.setShowStickyBottomAd,
+    showStickyBottomAd: context.showStickyBottomAd,
   };
 }
 

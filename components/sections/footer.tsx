@@ -4,7 +4,8 @@ import { useTheme } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
 
 export default function Footer() {
-  const { isDark } = useTheme();
+  const { isDark, showStickyBottomAd } = useTheme();
+
   const footerBg = isDark
     ? "bg-black border-t border-neutral-900"
     : "bg-white border-t border-zinc-200 shadow-sm";
@@ -18,14 +19,15 @@ export default function Footer() {
   return (
     <footer
       className={cn(
-        "py-12 sm:py-16 relative z-10 transition-colors duration-300",
+        "py-12 sm:py-16 relative transition-all duration-300",
+        showStickyBottomAd && "mb-20",
         footerBg,
       )}
     >
       <div className="max-w-6xl mx-auto px-6 text-center space-y-8">
         <div
           className={cn(
-            "flex flex-col sm:flex-row items-center justify-between gap-6 pb-8 border-b",
+            "flex flex-col sm:flex-row items-center justify-between gap-6 border-b",
             subBorder,
           )}
         >
