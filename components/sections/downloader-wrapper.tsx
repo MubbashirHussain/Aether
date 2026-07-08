@@ -825,7 +825,12 @@ export default function DownloaderWrapper() {
               <X className="w-3 h-3" /> Close Ad
             </button>
 
-            <div className="w-full flex justify-center border border-neutral-900 rounded-lg overflow-hidden transition-all bg-neutral-950/20">
+            <div
+              className={cn(
+                "w-full flex justify-centerrounded-lg overflow-hidden transition-all rounded-xl",
+                isDark ? "skeleton-shimmer-dark" : "skeleton-shimmer-light",
+              )}
+            >
               <AdSenseSlot
                 clientId={adsenseClientId}
                 slotId={bottomAnchorSlotId || "5678901234"}
