@@ -22,7 +22,12 @@ export function AdBanner({
   const textMuted = isDark ? "text-zinc-500" : "text-zinc-400";
 
   return (
-    <div className="max-w-6xl mx-auto px-4 mt-4 border rounded-lg shadow-sm overflow-hidden">
+    <div
+      className={cn(
+        "max-w-6xl mx-auto px-4 my-4 rounded-lg overflow-hidden",
+        isDark ? "skeleton-shimmer-dark" : "skeleton-shimmer-light",
+      )}
+    >
       {/* <div
         className={cn(
           "relative rounded-xl border transition-all overflow-hidden",
@@ -66,10 +71,10 @@ export function AdBanner({
             Advertisement
           </span> */}
 
-          <div className="w-full max-w-4xl flex justify-center">
-            <AdSenseSlot clientId={clientId} slotId={slotId} format="auto" />
-          </div>
-        </div>
+      <div className="w-full max-w-4xl flex justify-center">
+        <AdSenseSlot clientId={clientId} slotId={slotId} format="auto" />
+      </div>
+    </div>
     //   </div>
     // </div>
   );

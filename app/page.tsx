@@ -22,14 +22,14 @@ export default function App() {
     <div
       className={cn(
         "min-h-screen font-light tracking-tight antialiased relative transition-all duration-300",
-        rootBg
+        rootBg,
       )}
     >
       {/* Background glow vector */}
       <div
         className={cn(
           "absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-gradient-to-b via-transparent to-transparent pointer-events-none z-0",
-          isDark ? "from-neutral-950/40" : "from-zinc-100/40"
+          isDark ? "from-neutral-950/40" : "from-zinc-100/40",
         )}
       />
 
@@ -37,7 +37,7 @@ export default function App() {
 
       <main className="relative z-10 max-w-6xl mx-auto px-6">
         <HeroSection />
-        
+
         <div id="downloader-section" className="mb-12">
           <DownloaderWrapper />
         </div>

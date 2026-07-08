@@ -642,7 +642,12 @@ export default function DownloaderWrapper() {
         </div>
 
         {/* Sidebar Banner Ad */}
-        <div className="lg:col-span-4 border border-neutral-900 rounded-2xl p-4 sm:p-6 bg-zinc-950/40 backdrop-blur-sm min-h-[300px] flex items-center justify-center">
+        <div
+          className={cn(
+            "lg:col-span-4 rounded-2xl p-4 sm:p-6 backdrop-blur-sm min-h-[300px] h-full flex items-center justify-center",
+            isDark ? "skeleton-shimmer-dark" : "skeleton-shimmer-light",
+          )}
+        >
           <AdSenseSlot
             slotId={sidebarSlotId}
             format="auto"
