@@ -9,19 +9,16 @@ import Footer from "@/components/sections/footer";
 
 export const metadata = {
   title: "Aether Downloader | Free Social Media Video Downloader",
-  description: "Extract uncompressed source media streams directly from Instagram, TikTok, YouTube, and Facebook. Zero compression, high speed.",
+  description:
+    "Extract uncompressed source media streams directly from Instagram, TikTok, YouTube, and Facebook. Zero compression, high speed.",
 };
 
 export default function App() {
   return (
-    <div
-      className="min-h-screen font-light tracking-tight antialiased relative transition-all duration-300 bg-zinc-50 text-zinc-800 selection:bg-zinc-200 selection:text-zinc-900 dark:bg-black dark:text-neutral-400 dark:selection:bg-neutral-800 dark:selection:text-white"
-    >
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-gradient-to-b via-transparent to-transparent pointer-events-none z-0 from-zinc-100/40 dark:from-neutral-950/40"
-      />
+    <div className="min-h-screen font-light tracking-tight antialiased relative transition-all duration-300 bg-zinc-50 text-zinc-800 selection:bg-zinc-200 selection:text-zinc-900 dark:bg-black dark:text-neutral-400 dark:selection:bg-neutral-800 dark:selection:text-white">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-gradient-to-b via-transparent to-transparent pointer-events-none z-0 from-zinc-100/40 dark:from-neutral-950/40" />
       <NavBar />
-      <main className="relative z-10 max-w-6xl mx-auto px-6">
+      <main className="relative max-w-6xl mx-auto px-6">
         {/* Background glow vector */}
         <div className="absolute top-10 left-1/2 -translate-x-1/2 pointer-events-none flex items-center justify-center z-1">
           <div className="mooving_blob w-[300px] h-[300px] bg-gradient-to-r from-neutral-950/30 to-zinc-900/30 blur-[120px] rounded-full" />
@@ -41,4 +38,3 @@ export default function App() {
     </div>
   );
 }
-
