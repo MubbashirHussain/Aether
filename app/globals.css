@@ -62,3 +62,20 @@ body {
   background-size: 400% 100%;
   animation: shimmer 6s ease-in-out infinite;
 }
+
+.mooving_blob {
+  animation: mooving_blob 10s infinite;
+  transition: all 0.3s ease-in-out;
+}
+
+@keyframes mooving_blob {
+  0% {
+    translate: 0, 0;
+  }
+  50% {
+    translate: -30%, 80%;
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}

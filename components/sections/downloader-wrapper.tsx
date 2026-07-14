@@ -802,7 +802,7 @@ export default function DownloaderWrapper() {
       {showStickyBottomAd && (
         <div
           className={cn(
-            "fixed bottom-0 left-0 right-0 z-40 border-t py-3.5 backdrop-blur-md transition-colors duration-300 shadow-[0_-8px_30px_rgba(0,0,0,0.4)]",
+            "fixed bottom-0 left-0 right-0 z-40 border-t py-3.5 backdrop-blur-md transition-colors duration-300 ",
             isDark
               ? "bg-black/95 border-neutral-900"
               : "bg-white/95 border-zinc-200",

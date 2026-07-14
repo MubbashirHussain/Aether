@@ -25,23 +25,23 @@ export default function App() {
         rootBg,
       )}
     >
-      {/* Background glow vector */}
       <div
         className={cn(
           "absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-gradient-to-b via-transparent to-transparent pointer-events-none z-0",
           isDark ? "from-neutral-950/40" : "from-zinc-100/40",
         )}
       />
-
       <NavBar />
-
       <main className="relative z-10 max-w-6xl mx-auto px-6">
-        <HeroSection />
+        {/* Background glow vector */}
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 pointer-events-none flex items-center justify-center z-1">
+          <div className="mooving_blob w-[300px] h-[300px] bg-gradient-to-r from-neutral-950/30 to-zinc-900/30 blur-[120px] rounded-full" />
+        </div>
 
+        <HeroSection />
         <div id="downloader-section" className="mb-12">
           <DownloaderWrapper />
         </div>
-
         <PlatformGrid />
         <StepGuide />
         <FeatureGrid />

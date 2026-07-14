@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useLayoutEffect,
+} from "react";
 
 type Theme = "light" | "dark";
 
@@ -15,20 +21,29 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
   const [showStickyBottomAd, setShowStickyBottomAd] = useState<boolean>(true);
 
   // Load theme from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("vdl_theme");
-    if (saved === "light" || saved === "dark") {
-      setTheme(saved);
+  useLayoutEffect(() => {
+    const up = localStorage.getItem("up"); // user preference 1 for true, 0 for false
+    if (!up) {
+      const deviceTheme = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
+      setTheme(deviceTheme ? "dark" : "light");
+    } else {
+      const saved = localStorage.getItem("vdl_theme");
+      if (saved === "light" || saved === "dark") {
+        setTheme(saved);
+      }
     }
   }, []);
 
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
+    localStorage.setItem("up", "1");
     localStorage.setItem("vdl_theme", nextTheme);
   };
 

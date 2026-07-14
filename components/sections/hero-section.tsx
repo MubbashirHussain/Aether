@@ -14,11 +14,6 @@ export default function HeroSection() {
 
   return (
     <section className="text-center py-10 sm:py-16 relative overflow-hidden">
-      {/* Background glow vector */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center -z-10">
-        <div className="w-[300px] h-[300px] bg-gradient-to-r from-neutral-950/30 to-zinc-900/30 blur-[120px] rounded-full" />
-      </div>
-
       <div className="max-w-3xl mx-auto px-6">
         <div
           className={cn(
