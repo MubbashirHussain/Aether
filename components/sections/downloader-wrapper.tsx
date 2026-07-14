@@ -638,9 +638,7 @@ export default function DownloaderWrapper() {
         </div>
 
         {/* Sidebar Banner Ad */}
-        <div
-          className="lg:col-span-4 rounded-2xl p-4 sm:p-6 backdrop-blur-sm min-h-[300px] h-full flex items-center justify-center skeleton-shimmer-light dark:skeleton-shimmer-dark"
-        >
+        <div className="lg:col-span-4 rounded-2xl p-4 sm:p-6 backdrop-blur-sm min-h-[300px] h-full flex items-center justify-center skeleton-shimmer-light dark:skeleton-shimmer-dark">
           <AdSenseSlot
             slotId={sidebarSlotId}
             format="auto"
@@ -656,13 +654,9 @@ export default function DownloaderWrapper() {
 
       {/* Resume incomplete downloads banner */}
       {resumeEntries.length > 0 && (
-        <section
-          className="rounded-2xl p-4 border mt-6 bg-amber-50 border-amber-400/60 dark:bg-amber-950/20 dark:border-amber-500/30"
-        >
+        <section className="rounded-2xl p-4 border mt-6 bg-amber-50 border-amber-400/60 dark:bg-amber-950/20 dark:border-amber-500/30">
           <div className="flex items-center justify-between mb-3">
-            <h3
-              className="text-xs font-bold font-mono text-amber-800 dark:text-amber-300"
-            >
+            <h3 className="text-xs font-bold font-mono text-amber-800 dark:text-amber-300">
               ⚡ Resume Incomplete Downloads
             </h3>
             <button
@@ -683,14 +677,10 @@ export default function DownloaderWrapper() {
                 className="flex items-center justify-between gap-3 p-3 rounded-xl border text-[11px] bg-white border-zinc-200 dark:bg-zinc-900/40 dark:border-neutral-900"
               >
                 <div className="min-w-0 flex-1">
-                  <p
-                    className="truncate font-medium text-zinc-800 dark:text-zinc-200"
-                  >
+                  <p className="truncate font-medium text-zinc-800 dark:text-zinc-200">
                     {entry.url.split("/").pop()?.slice(0, 40) || "Video"}
                   </p>
-                  <p
-                    className="text-[9px] font-mono mt-0.5 text-zinc-400 dark:text-zinc-500"
-                  >
+                  <p className="text-[9px] font-mono mt-0.5 text-zinc-400 dark:text-zinc-500">
                     {entry.platform} •{" "}
                     {new Date(entry.startedAt).toLocaleString()}
                   </p>
@@ -766,9 +756,7 @@ export default function DownloaderWrapper() {
 
       {/* Sticky Bottom anchor banner */}
       {showStickyBottomAd && (
-        <div
-          className="fixed bottom-0 left-0 right-0 z-40 border-t py-3.5 backdrop-blur-md transition-colors duration-300 bg-white/95 border-zinc-200 dark:bg-black/95 dark:border-neutral-900"
-        >
+        <div className="fixed bottom-0 left-0 right-0 z-40 border-t py-3.5 backdrop-blur-md transition-colors duration-300 bg-white/95 border-zinc-200 dark:bg-black/95 dark:border-neutral-900">
           <div className="max-w-5xl mx-auto px-4 relative flex flex-col items-center">
             <button
               onClick={() => {
@@ -781,9 +769,7 @@ export default function DownloaderWrapper() {
               <X className="w-3 h-3" /> Close Ad
             </button>
 
-            <div
-              className="w-full flex justify-center rounded-lg overflow-hidden transition-all rounded-xl skeleton-shimmer-light dark:skeleton-shimmer-dark"
-            >
+            <div className="w-full flex justify-center rounded-lg overflow-hidden transition-all rounded-xl skeleton-shimmer-light dark:skeleton-shimmer-dark">
               <AdSenseSlot
                 clientId={adsenseClientId}
                 slotId={bottomAnchorSlotId || "5678901234"}

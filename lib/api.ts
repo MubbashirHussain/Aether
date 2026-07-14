@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000";
+import { API_BASE } from "@/app/constant";
 
 interface FormatItem {
   formatId: string;
@@ -29,7 +29,10 @@ interface UnlockResponse {
   streamToken: string;
 }
 
-async function fetchAPI(url: string, options?: RequestInit): Promise<Response> {
+export async function fetchAPI(
+  url: string,
+  options?: RequestInit,
+): Promise<Response> {
   const response = await fetch(`${API_BASE}${url}`, {
     ...options,
     headers: {

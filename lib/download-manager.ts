@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000";
+import { API_BASE } from "@/app/constant";
 
 /**
  * Stores incomplete download info in localStorage so the user can resume.
@@ -134,7 +134,11 @@ export function waitForDownload(
           const json = await res.json();
           if (!json.success) {
             clearTimeout(timer);
-            done(new Error("Download status check failed — download may have expired."));
+            done(
+              new Error(
+                "Download status check failed — download may have expired.",
+              ),
+            );
           } else if (json.data.status === "completed") {
             clearTimeout(timer);
             done();
@@ -220,7 +224,8 @@ export async function downloadFile(
     onProgress({
       transferred: totalBytes,
       total: overallTotal,
-      percent: overallTotal > 0 ? Math.round((totalBytes / overallTotal) * 100) : 0,
+      percent:
+        overallTotal > 0 ? Math.round((totalBytes / overallTotal) * 100) : 0,
     });
   }
 
@@ -316,8 +321,6 @@ export function removeResumeState(downloadId: string): void {
 /**
  * Get a resume entry for a specific download.
  */
-export function getResumeEntry(
-  downloadId: string,
-): ResumeEntry | undefined {
+export function getResumeEntry(downloadId: string): ResumeEntry | undefined {
   return getResumeDownloads().find((e) => e.downloadId === downloadId);
 }
