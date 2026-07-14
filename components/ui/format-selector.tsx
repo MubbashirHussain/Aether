@@ -4,7 +4,6 @@ import { Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type FormatSelectorProps = {
-  isDark: boolean;
   parsedVideo: {
     title: string;
     thumbnail: string;
@@ -26,50 +25,26 @@ export type FormatSelectorProps = {
 };
 
 export function FormatSelector({
-  isDark,
   parsedVideo,
   onDownload,
 }: FormatSelectorProps) {
-  const cardBg = isDark
-    ? "bg-zinc-900 border-zinc-800"
-    : "bg-white border-zinc-200 shadow-sm";
-  const innerCardBg = isDark
-    ? "bg-zinc-950 border-zinc-850"
-    : "bg-zinc-50 border-zinc-200";
-  const textTitle = isDark ? "text-zinc-200" : "text-zinc-850";
-  const btnPrimary = isDark
-    ? "bg-zinc-100 hover:bg-white text-zinc-950"
-    : "bg-zinc-900 hover:bg-zinc-800 text-white";
-
   if (!parsedVideo) return null;
 
   // console.log("thumpnail in format selector", parsedVideo.thumbnail);
 
   return (
     <section
-      className={cn(
-        "border rounded-2xl overflow-hidden animate-fade-in",
-        cardBg,
-      )}
+      className="border rounded-2xl overflow-hidden animate-fade-in bg-white border-zinc-200 shadow-sm dark:bg-zinc-900 dark:border-zinc-800"
     >
       <div
-        className={cn(
-          "px-4 py-3 border-b flex items-center justify-between gap-2",
-          isDark ? "bg-zinc-950 border-zinc-850" : "bg-zinc-50 border-zinc-200",
-        )}
+        className="px-4 py-3 border-b flex items-center justify-between gap-2 bg-zinc-50 border-zinc-200 dark:bg-zinc-950 dark:border-zinc-850"
       >
         <span
-          className={cn(
-            "text-[9px] sm:text-[10px] font-mono tracking-wider truncate",
-            isDark ? "text-zinc-400" : "text-zinc-600",
-          )}
+          className="text-[9px] sm:text-[10px] font-mono tracking-wider truncate text-zinc-600 dark:text-zinc-400"
         >
           Resolved node author:{" "}
           <span
-            className={cn(
-              isDark ? "text-zinc-200" : "text-zinc-800",
-              "font-semibold",
-            )}
+            className="font-semibold text-zinc-800 dark:text-zinc-200"
           >
             {parsedVideo.author}
           </span>
@@ -79,12 +54,7 @@ export function FormatSelector({
       <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
         <div className="md:col-span-5 space-y-3">
           <div
-            className={cn(
-              "relative aspect-video rounded-xl overflow-hidden border",
-              isDark
-                ? "bg-zinc-950 border-zinc-850"
-                : "bg-zinc-100 border-zinc-250 shadow-sm",
-            )}
+            className="relative aspect-video rounded-xl overflow-hidden border bg-zinc-100 border-zinc-250 shadow-sm dark:bg-zinc-950 dark:border-zinc-850"
           >
             <img
               src={
@@ -104,10 +74,7 @@ export function FormatSelector({
 
         <div className="md:col-span-7 space-y-4">
           <h3
-            className={cn(
-              "text-[11px] sm:text-xs font-mono uppercase tracking-widest",
-              isDark ? "text-zinc-400" : "text-zinc-500",
-            )}
+            className="text-[11px] sm:text-xs font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400"
           >
             Select Available Quality:
           </h3>
@@ -116,19 +83,11 @@ export function FormatSelector({
             {parsedVideo.formats.map((format, idx) => (
               <div
                 key={idx}
-                className={cn(
-                  "p-3 sm:p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition border",
-                  isDark
-                    ? "bg-zinc-950 border-zinc-850 hover:border-zinc-800"
-                    : "bg-zinc-50 border-zinc-200 hover:border-zinc-300 shadow-sm",
-                )}
+                className="p-3 sm:p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition border bg-zinc-50 border-zinc-200 hover:border-zinc-300 shadow-sm dark:bg-zinc-950 dark:border-zinc-850 dark:hover:border-zinc-800"
               >
                 <div className="min-w-0 flex-1">
                   <p
-                    className={cn(
-                      "text-xs sm:text-sm font-bold truncate",
-                      textTitle,
-                    )}
+                    className="text-xs sm:text-sm font-bold truncate text-zinc-850 dark:text-zinc-200"
                   >
                     {format.quality}
                   </p>
@@ -139,12 +98,7 @@ export function FormatSelector({
 
                 <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-0">
                   <span
-                    className={cn(
-                      "text-[9px] font-mono px-2 py-1 rounded border",
-                      isDark
-                        ? "bg-zinc-900 border-zinc-800 text-zinc-400"
-                        : "bg-white border-zinc-200 text-zinc-500 shadow-sm",
-                    )}
+                    className="text-[9px] font-mono px-2 py-1 rounded border bg-white border-zinc-200 text-zinc-500 shadow-sm dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-400"
                   >
                     {format.size}
                   </span>
@@ -156,10 +110,7 @@ export function FormatSelector({
                         parsedVideo.formats[idx].isAudioAvailable,
                       )
                     }
-                    className={cn(
-                      "text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer",
-                      btnPrimary,
-                    )}
+                    className="text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950"
                     title="Download to system"
                   >
                     <Download className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -174,3 +125,5 @@ export function FormatSelector({
     </section>
   );
 }
+
+

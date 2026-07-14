@@ -1,17 +1,6 @@
-"use client";
-
 import React from "react";
-import { cn } from "@/lib/utils";
-import { useTheme } from "@/context/AppContext";
 
 export default function PlatformGrid() {
-  const { isDark } = useTheme();
-  const titleColor = isDark ? "text-neutral-100" : "text-neutral-900";
-  const descColor = isDark ? "text-neutral-450" : "text-neutral-500";
-  const cardBg = isDark
-    ? "bg-zinc-950/40 border-neutral-900 hover:border-neutral-800"
-    : "bg-white border-zinc-200 hover:border-zinc-350 shadow-sm";
-
   const platforms = [
     {
       name: "Instagram Reels & Posts",
@@ -101,10 +90,7 @@ export default function PlatformGrid() {
             Platform Nodes
           </h2>
           <h3
-            className={cn(
-              "text-2xl sm:text-3xl font-light tracking-tight mt-2",
-              titleColor,
-            )}
+            className="text-2xl sm:text-3xl font-light tracking-tight mt-2 text-neutral-900 dark:text-neutral-100"
           >
             Compatibility Network
           </h3>
@@ -114,28 +100,19 @@ export default function PlatformGrid() {
           {platforms.map((p, idx) => (
             <div
               key={idx}
-              className={cn(
-                "p-6 sm:p-8 rounded-2xl border transition-all duration-300 flex items-start gap-4",
-                cardBg,
-              )}
+              className="p-6 sm:p-8 rounded-2xl border transition-all duration-300 flex items-start gap-4 bg-white border-zinc-200 hover:border-zinc-350 dark:bg-zinc-950/40 dark:border-neutral-900 dark:hover:border-neutral-800 shadow-sm"
             >
               <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-xl text-neutral-300 shrink-0">
                 {p.svg}
               </div>
               <div className="space-y-1">
                 <h4
-                  className={cn(
-                    "text-sm font-semibold tracking-tight",
-                    titleColor,
-                  )}
+                  className="text-sm font-semibold tracking-tight text-neutral-900 dark:text-neutral-100"
                 >
                   {p.name}
                 </h4>
                 <p
-                  className={cn(
-                    "text-xs leading-relaxed font-light",
-                    descColor,
-                  )}
+                  className="text-xs leading-relaxed font-light text-neutral-500 dark:text-neutral-450"
                 >
                   {p.copy}
                 </p>
@@ -147,3 +124,4 @@ export default function PlatformGrid() {
     </section>
   );
 }
+

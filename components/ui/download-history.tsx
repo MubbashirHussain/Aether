@@ -1,10 +1,8 @@
 "use client";
 
 import { Check, Copy, Download as DownloadIcon, History } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export type DownloadHistoryProps = {
-  isDark: boolean;
   downloadHistory: {
     id: string;
     title: string;
@@ -20,45 +18,25 @@ export type DownloadHistoryProps = {
 };
 
 export function DownloadHistory({
-  isDark,
   downloadHistory,
   onCopyHistory,
   onReFetch,
   onClearHistory,
   copiedIndex,
 }: DownloadHistoryProps) {
-  const cardBg = isDark
-    ? "bg-zinc-900 border-zinc-850"
-    : "bg-white border-zinc-200 shadow-sm";
-  const innerCardBg = isDark
-    ? "bg-zinc-950 border-zinc-850"
-    : "bg-zinc-50 border-zinc-200";
-  const textTitle = isDark ? "text-zinc-200" : "text-zinc-800";
-  const textMuted = isDark ? "text-zinc-400" : "text-zinc-500";
-
   return (
-    <section className={cn("rounded-2xl p-4 sm:p-5 border", cardBg)}>
-      <div
-        className={cn(
-          "flex items-center justify-between mb-4 pb-3 border-b gap-2",
-          isDark ? "border-zinc-850" : "border-zinc-200",
-        )}
-      >
+    <section className="rounded-2xl p-4 sm:p-5 border bg-white border-zinc-200 shadow-sm dark:bg-zinc-900 dark:border-zinc-850">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b gap-2 border-zinc-200 dark:border-zinc-850">
         <div className="flex items-center gap-2 min-w-0">
           <History className="w-4 h-4 text-zinc-400 shrink-0" />
-          <h3 className={cn("text-sm font-semibold truncate", textTitle)}>
+          <h3 className="text-sm font-semibold truncate text-zinc-800 dark:text-zinc-200">
             Local Download Cache
           </h3>
         </div>
         {downloadHistory.length > 0 && (
           <button
             onClick={onClearHistory}
-            className={cn(
-              "text-xs font-semibold transition shrink-0 cursor-pointer",
-              isDark
-                ? "text-zinc-400 hover:text-zinc-200"
-                : "text-zinc-500 hover:text-zinc-800",
-            )}
+            className="text-xs font-semibold transition shrink-0 cursor-pointer text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
           >
             Purge Storage
           </button>
@@ -66,7 +44,7 @@ export function DownloadHistory({
       </div>
 
       {downloadHistory.length === 0 ? (
-        <div className={cn("text-center py-6 rounded-xl border", innerCardBg)}>
+        <div className="text-center py-6 rounded-xl border bg-zinc-50 border-zinc-200 dark:bg-zinc-950 dark:border-zinc-850">
           <p className="text-xs text-zinc-500 font-mono p-4">
             No downloaded files in local cache yet.
           </p>
@@ -76,32 +54,19 @@ export function DownloadHistory({
           {downloadHistory.map((item, idx) => (
             <div
               key={item.id}
-              className={cn(
-                "p-3 rounded-xl flex items-center gap-3 border transition",
-                isDark
-                  ? "bg-zinc-950 border-zinc-850 hover:border-zinc-800"
-                  : "bg-zinc-50 border-zinc-200 hover:border-zinc-300 shadow-sm",
-              )}
+              className="p-3 rounded-xl flex items-center gap-3 border transition bg-zinc-50 border-zinc-200 hover:border-zinc-300 shadow-sm dark:bg-zinc-950 dark:border-zinc-850 dark:hover:border-zinc-800"
             >
               <img
                 src={item.thumbnail}
                 alt="history item preview"
-                className={cn(
-                  "w-10 h-10 rounded object-cover shrink-0 opacity-70 border",
-                  isDark ? "border-zinc-800" : "border-zinc-250 shadow-sm",
-                )}
+                className="w-10 h-10 rounded object-cover shrink-0 opacity-70 border border-zinc-250 shadow-sm dark:border-zinc-800"
               />
 
               <div className="min-w-0 flex-1">
                 <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">
                   {item.platform}
                 </span>
-                <h4
-                  className={cn(
-                    "text-xs font-semibold truncate mt-0.5",
-                    textTitle,
-                  )}
-                >
+                <h4 className="text-xs font-semibold truncate mt-0.5 text-zinc-800 dark:text-zinc-200">
                   {item.title}
                 </h4>
               </div>
@@ -109,12 +74,7 @@ export function DownloadHistory({
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   onClick={() => onCopyHistory(item.url, idx)}
-                  className={cn(
-                    "p-1.5 rounded border transition cursor-pointer",
-                    isDark
-                      ? "bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-450"
-                      : "bg-white hover:bg-zinc-100 border-zinc-250 text-zinc-500 shadow-sm",
-                  )}
+                  className="p-1.5 rounded border transition cursor-pointer bg-white hover:bg-zinc-100 border-zinc-250 text-zinc-500 shadow-sm dark:bg-zinc-900 dark:hover:bg-zinc-850 dark:border-zinc-800 dark:text-zinc-450"
                   title="Copy Link"
                 >
                   {copiedIndex === idx ? (
@@ -125,12 +85,7 @@ export function DownloadHistory({
                 </button>
                 <button
                   onClick={() => onReFetch(item.url, item.platform)}
-                  className={cn(
-                    "p-1.5 rounded border transition cursor-pointer",
-                    isDark
-                      ? "bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-300 hover:text-white"
-                      : "bg-white hover:bg-zinc-100 border-zinc-250 text-zinc-650 shadow-sm",
-                  )}
+                  className="p-1.5 rounded border transition cursor-pointer bg-white hover:bg-zinc-100 border-zinc-250 text-zinc-650 shadow-sm dark:bg-zinc-900 dark:hover:bg-zinc-850 dark:border-zinc-800 dark:text-zinc-300 dark:hover:text-white"
                   title="Re-fetch Video Stream"
                 >
                   <DownloadIcon className="w-3.5 h-3.5" />

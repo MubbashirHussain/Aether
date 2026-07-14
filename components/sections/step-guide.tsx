@@ -1,20 +1,6 @@
-"use client";
-
 import React from "react";
-import { cn } from "@/lib/utils";
-import { useTheme } from "@/context/AppContext";
 
 export default function StepGuide() {
-  const { isDark } = useTheme();
-  const titleColor = isDark ? "text-neutral-100" : "text-neutral-900";
-  const descColor = isDark ? "text-neutral-450" : "text-neutral-500";
-  const cardBg = isDark
-    ? "bg-zinc-950/40 border-neutral-900 hover:border-neutral-800"
-    : "bg-white border-zinc-200 hover:border-zinc-350 shadow-sm";
-  const badgeBg = isDark
-    ? "bg-neutral-900 border-neutral-800 text-neutral-300"
-    : "bg-zinc-50 border-zinc-200 text-zinc-650 shadow-sm";
-
   const steps = [
     {
       step: 1,
@@ -84,10 +70,7 @@ export default function StepGuide() {
             Extraction Protocol
           </h2>
           <h3
-            className={cn(
-              "text-2xl sm:text-3xl font-light tracking-tight mt-2",
-              titleColor,
-            )}
+            className="text-2xl sm:text-3xl font-light tracking-tight mt-2 text-neutral-900 dark:text-neutral-100"
           >
             Step-by-Step Guide
           </h3>
@@ -97,17 +80,11 @@ export default function StepGuide() {
           {steps.map((s, idx) => (
             <div
               key={idx}
-              className={cn(
-                "p-6 sm:p-8 rounded-2xl border transition-all duration-300 relative",
-                cardBg,
-              )}
+              className="p-6 sm:p-8 rounded-2xl border transition-all duration-300 relative bg-white border-zinc-200 hover:border-zinc-350 dark:bg-zinc-950/40 dark:border-neutral-900 dark:hover:border-neutral-800 shadow-sm"
             >
               <div className="flex justify-between items-start mb-6">
                 <div
-                  className={cn(
-                    "w-8 h-8 rounded-lg text-xs font-bold font-mono flex items-center justify-center border shadow-sm",
-                    badgeBg,
-                  )}
+                  className="w-8 h-8 rounded-lg text-xs font-bold font-mono flex items-center justify-center border shadow-sm bg-zinc-50 border-zinc-200 text-zinc-650 dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-300"
                 >
                   {String(s.step).padStart(2, "0")}
                 </div>
@@ -116,15 +93,12 @@ export default function StepGuide() {
                 </div>
               </div>
               <h4
-                className={cn(
-                  "text-base font-semibold mb-2 tracking-tight",
-                  titleColor,
-                )}
+                className="text-base font-semibold mb-2 tracking-tight text-neutral-900 dark:text-neutral-100"
               >
                 {s.title}
               </h4>
               <p
-                className={cn("text-xs leading-relaxed font-light", descColor)}
+                className="text-xs leading-relaxed font-light text-neutral-500 dark:text-neutral-450"
               >
                 {s.copy}
               </p>
@@ -135,3 +109,4 @@ export default function StepGuide() {
     </section>
   );
 }
+

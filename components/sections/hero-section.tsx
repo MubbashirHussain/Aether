@@ -1,25 +1,11 @@
-"use client";
-
-import React from "react";
-import { cn } from "@/lib/utils";
-import { useTheme } from "@/context/AppContext";
 
 export default function HeroSection() {
-  const { isDark } = useTheme();
-  const textTitle = isDark ? "text-neutral-100" : "text-neutral-900";
-  const textSub = isDark ? "text-neutral-450" : "text-neutral-500";
-  const badgeStyle = isDark
-    ? "bg-neutral-950/80 border-neutral-900 text-neutral-400"
-    : "bg-zinc-50 border-zinc-200 text-zinc-650 shadow-sm";
-
   return (
     <section className="text-center py-10 sm:py-16 relative overflow-hidden">
       <div className="max-w-3xl mx-auto px-6">
         <div
-          className={cn(
-            "inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase border",
-            badgeStyle,
-          )}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase border 
+                     bg-zinc-50 dark:bg-neutral-950/80 border-zinc-200 dark:border-neutral-900 text-zinc-650 dark:text-neutral-400 shadow-sm"
         >
           {/* Crisp Inline SVG badge icon */}
           <svg
@@ -37,19 +23,15 @@ export default function HeroSection() {
         </div>
 
         <h1
-          className={cn(
-            "text-3xl sm:text-5xl lg:text-6xl font-light tracking-tight mt-6 mb-4 leading-tight sm:leading-none",
-            textTitle,
-          )}
+          className="text-3xl sm:text-5xl lg:text-6xl font-light tracking-tight mt-6 mb-4 leading-tight sm:leading-none 
+                     text-neutral-900 dark:text-neutral-100"
         >
           Decentralized Media Stream Extraction
         </h1>
 
         <p
-          className={cn(
-            "text-xs sm:text-base leading-relaxed max-w-xl mx-auto font-light",
-            textSub,
-          )}
+          className="text-xs sm:text-base leading-relaxed max-w-xl mx-auto font-light 
+                     text-neutral-500 dark:text-neutral-450"
         >
           Retrieve uncompressed source media files directly from social platform
           delivery nodes. Bypass compression pipelines on Instagram, TikTok,
@@ -59,3 +41,4 @@ export default function HeroSection() {
     </section>
   );
 }
+

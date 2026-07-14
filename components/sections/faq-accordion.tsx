@@ -2,17 +2,9 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/context/AppContext";
 
 export default function FAQAccordion() {
-  const { isDark } = useTheme();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const titleColor = isDark ? "text-neutral-100" : "text-neutral-900";
-  const questionColor = isDark ? "text-neutral-200" : "text-neutral-850";
-  const descColor = isDark ? "text-neutral-450" : "text-neutral-500";
-  const itemBorder = isDark ? "border-neutral-900" : "border-zinc-200";
-  const activeBg = isDark ? "bg-neutral-950/30" : "bg-zinc-50/50";
 
   const faqs = [
     {
@@ -52,10 +44,7 @@ export default function FAQAccordion() {
             Support Panel
           </h2>
           <h3
-            className={cn(
-              "text-2xl sm:text-3xl font-light tracking-tight mt-2",
-              titleColor,
-            )}
+            className="text-2xl sm:text-3xl font-light tracking-tight mt-2 text-neutral-900 dark:text-neutral-100"
           >
             Frequently Asked Questions
           </h3>
@@ -68,9 +57,8 @@ export default function FAQAccordion() {
               <div
                 key={idx}
                 className={cn(
-                  "border rounded-2xl overflow-hidden transition-all duration-300",
-                  itemBorder,
-                  isOpen ? activeBg : "bg-transparent",
+                  "border rounded-2xl overflow-hidden transition-all duration-300 border-zinc-200 dark:border-neutral-900",
+                  isOpen ? "bg-zinc-50/50 dark:bg-neutral-950/30" : "bg-transparent",
                 )}
               >
                 <button
@@ -78,10 +66,7 @@ export default function FAQAccordion() {
                   className="w-full text-left px-6 py-5 flex items-center justify-between gap-4 select-none hover:bg-neutral-900/20 transition-colors"
                 >
                   <span
-                    className={cn(
-                      "text-xs sm:text-sm font-semibold tracking-tight",
-                      questionColor,
-                    )}
+                    className="text-xs sm:text-sm font-semibold tracking-tight text-neutral-850 dark:text-neutral-200"
                   >
                     {faq.question}
                   </span>
@@ -110,10 +95,7 @@ export default function FAQAccordion() {
                   )}
                 >
                   <div
-                    className={cn(
-                      "px-6 pb-6 text-[11px] sm:text-xs leading-relaxed font-light",
-                      descColor,
-                    )}
+                    className="px-6 pb-6 text-[11px] sm:text-xs leading-relaxed font-light text-neutral-500 dark:text-neutral-450"
                   >
                     {faq.answer}
                   </div>
@@ -126,3 +108,4 @@ export default function FAQAccordion() {
     </section>
   );
 }
+

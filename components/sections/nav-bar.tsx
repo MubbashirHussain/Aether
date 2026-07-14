@@ -1,38 +1,22 @@
 "use client";
 
-import React from "react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "../ui";
 import { useTheme } from "@/context/AppContext";
 
 export default function NavBar() {
   const { isDark, toggleTheme } = useTheme();
-  const headerBg = isDark
-    ? "bg-black/80 border-neutral-900"
-    : "bg-white/80 border-neutral-200";
-  const headerText = isDark ? "text-neutral-100" : "text-neutral-900";
-  const headerLinks = isDark
-    ? "text-neutral-400 hover:text-neutral-100"
-    : "text-neutral-600 hover:text-neutral-900";
 
   return (
     <header
-      className={cn(
-        "sticky top-0 z-40 backdrop-blur-md border-b transition-colors duration-300",
-        headerBg,
-      )}
+      className="sticky top-0 z-10 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-900 bg-white/80 dark:bg-black/80 transition-colors duration-300"
     >
       <div className="max-w-6xl mx-auto px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
         {/* Branding Logo & Status */}
         <div className="flex items-center gap-3">
           {/* Crisp Inline SVG Logo */}
           <div
-            className={cn(
-              "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition-all duration-300",
-              isDark
-                ? "bg-zinc-950 border-neutral-900 text-white"
-                : "bg-zinc-50 border-zinc-200 text-zinc-900",
-            )}
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition-all duration-300 bg-zinc-50 border-zinc-200 text-zinc-900 dark:bg-zinc-950 dark:border-neutral-900 dark:text-white"
           >
             <svg
               className="w-4.5 h-4.5 stroke-[2] stroke-current"
@@ -47,10 +31,7 @@ export default function NavBar() {
           </div>
           <div className="flex flex-col min-w-0">
             <span
-              className={cn(
-                "text-sm font-light tracking-tight leading-none truncate",
-                headerText,
-              )}
+              className="text-sm font-light tracking-tight leading-none truncate text-neutral-900 dark:text-neutral-100"
             >
               Aether Downloader
             </span>
@@ -65,25 +46,25 @@ export default function NavBar() {
         <div className="hidden md:flex items-center gap-8 text-xs font-mono tracking-wider">
           <a
             href="#downloader-section"
-            className={cn("transition-colors duration-200", headerLinks)}
+            className="transition-colors duration-200 text-zinc-650 hover:text-zinc-900 dark:text-neutral-400 dark:hover:text-neutral-100"
           >
             PARSER
           </a>
           <a
             href="#platform-grid"
-            className={cn("transition-colors duration-200", headerLinks)}
+            className="transition-colors duration-200 text-zinc-650 hover:text-zinc-900 dark:text-neutral-400 dark:hover:text-neutral-100"
           >
             COMPATIBILITY
           </a>
           <a
             href="#step-guide"
-            className={cn("transition-colors duration-200", headerLinks)}
+            className="transition-colors duration-200 text-zinc-650 hover:text-zinc-900 dark:text-neutral-400 dark:hover:text-neutral-100"
           >
             WORKFLOW
           </a>
           <a
             href="#faq-accordion"
-            className={cn("transition-colors duration-200", headerLinks)}
+            className="transition-colors duration-200 text-zinc-650 hover:text-zinc-900 dark:text-neutral-400 dark:hover:text-neutral-100"
           >
             FAQS
           </a>

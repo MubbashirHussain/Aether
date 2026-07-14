@@ -6,30 +6,20 @@ import { cn } from "@/lib/utils";
 export type NotificationProps = {
   message: string;
   type: "success" | "info";
-  isDark: boolean;
   onClose: () => void;
 };
 
 export function Notification({
   message,
   type,
-  isDark,
   onClose,
 }: NotificationProps) {
   return (
     <div
-      className={cn(
-        "fixed top-4 right-4 z-50 animate-fade-in shadow-2xl rounded-xl p-3.5 border backdrop-blur-md flex items-center gap-3 max-w-[calc(100vw-2rem)] sm:max-w-sm",
-        isDark
-          ? "bg-zinc-900/98 border-zinc-800/80 text-zinc-300"
-          : "bg-white border-zinc-200 text-zinc-800"
-      )}
+      className="fixed top-4 right-4 !z-50 animate-fade-in shadow-2xl rounded-xl p-3.5 border backdrop-blur-md flex items-center gap-3 max-w-[calc(100vw-2rem)] sm:max-w-sm bg-white border-zinc-200 text-zinc-800 dark:bg-zinc-900/98 dark:border-zinc-800/80 dark:text-zinc-300"
     >
       <div
-        className={cn(
-          "p-1 rounded-lg shrink-0",
-          isDark ? "bg-zinc-800 text-emerald-400" : "bg-zinc-100 text-emerald-600"
-        )}
+        className="p-1 rounded-lg shrink-0 bg-zinc-100 text-emerald-600 dark:bg-zinc-800 dark:text-emerald-400"
       >
         <Check className="w-4 h-4" />
       </div>
@@ -43,3 +33,4 @@ export function Notification({
     </div>
   );
 }
+

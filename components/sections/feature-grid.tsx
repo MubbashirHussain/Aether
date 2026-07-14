@@ -1,17 +1,6 @@
-"use client";
-
 import React from "react";
-import { cn } from "@/lib/utils";
-import { useTheme } from "@/context/AppContext";
 
 export default function FeatureGrid() {
-  const { isDark } = useTheme();
-  const titleColor = isDark ? "text-neutral-100" : "text-neutral-900";
-  const descColor = isDark ? "text-neutral-450" : "text-neutral-500";
-  const cardBg = isDark
-    ? "bg-zinc-950/40 border-neutral-900 hover:border-neutral-800"
-    : "bg-white border-zinc-200 hover:border-zinc-350 shadow-sm";
-
   const features = [
     {
       title: "10Gbps Extraction Pipe",
@@ -93,10 +82,7 @@ export default function FeatureGrid() {
             System Features
           </h2>
           <h3
-            className={cn(
-              "text-2xl sm:text-3xl font-light tracking-tight mt-2",
-              titleColor,
-            )}
+            className="text-2xl sm:text-3xl font-light tracking-tight mt-2 text-neutral-900 dark:text-neutral-100"
           >
             Performance & Safety Metrics
           </h3>
@@ -106,28 +92,19 @@ export default function FeatureGrid() {
           {features.map((f, idx) => (
             <div
               key={idx}
-              className={cn(
-                "p-6 rounded-2xl border transition-all duration-300 flex flex-col justify-between",
-                cardBg,
-              )}
+              className="p-6 rounded-2xl border transition-all duration-300 flex flex-col justify-between bg-white border-zinc-200 hover:border-zinc-350 dark:bg-zinc-950/40 dark:border-neutral-900 dark:hover:border-neutral-800 shadow-sm"
             >
               <div className="space-y-4">
                 <div className="w-10 h-10 bg-neutral-900 border border-neutral-850 rounded-xl flex items-center justify-center">
                   {f.svg}
                 </div>
                 <h4
-                  className={cn(
-                    "text-sm font-semibold tracking-tight",
-                    titleColor,
-                  )}
+                  className="text-sm font-semibold tracking-tight text-neutral-900 dark:text-neutral-100"
                 >
                   {f.title}
                 </h4>
                 <p
-                  className={cn(
-                    "text-xs leading-relaxed font-light",
-                    descColor,
-                  )}
+                  className="text-xs leading-relaxed font-light text-neutral-500 dark:text-neutral-450"
                 >
                   {f.desc}
                 </p>
@@ -139,3 +116,4 @@ export default function FeatureGrid() {
     </section>
   );
 }
+

@@ -4,7 +4,6 @@ import { Download, ExternalLink, Info, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type VideoPlayerProps = {
-  isDark: boolean;
   parsedVideo: {
     thumbnail: string;
   } | null;
@@ -28,7 +27,6 @@ export type VideoPlayerProps = {
 };
 
 export function VideoPlayer({
-  isDark,
   parsedVideo,
   streamToken,
   onOpenInNewTab,
@@ -37,18 +35,6 @@ export function VideoPlayer({
   downloadProgress,
   onCancelDownload,
 }: VideoPlayerProps) {
-  const cardBg = isDark
-    ? "bg-zinc-900 border-zinc-800"
-    : "bg-white border-zinc-200 shadow-sm";
-  const innerCardBg = isDark
-    ? "bg-zinc-950 border-zinc-850"
-    : "bg-zinc-50 border-zinc-200";
-  const textTitle = isDark ? "text-zinc-200" : "text-zinc-800";
-  const textMuted = isDark ? "text-zinc-400" : "text-zinc-500";
-  const btnPrimary = isDark
-    ? "bg-zinc-100 hover:bg-white text-zinc-950"
-    : "bg-zinc-900 hover:bg-zinc-800 text-white";
-
   const isDownloading =
     downloadProgress?.phase === "ytdlp" ||
     downloadProgress?.phase === "file";
@@ -62,19 +48,13 @@ export function VideoPlayer({
           {/* Phase badge */}
           <div className="flex items-center justify-between">
             <span
-              className={cn(
-                "text-[10px] font-mono flex items-center gap-1.5",
-                isDark ? "text-blue-400" : "text-blue-600",
-              )}
+              className="text-[10px] font-mono flex items-center gap-1.5 text-blue-600 dark:text-blue-400"
             >
               <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
               Processing on server...
             </span>
             <span
-              className={cn(
-                "text-[10px] font-mono font-bold",
-                isDark ? "text-zinc-300" : "text-zinc-700",
-              )}
+              className="text-[10px] font-mono font-bold text-zinc-700 dark:text-zinc-300"
             >
               {downloadProgress.ytdlpPercent.toFixed(1)}%
             </span>
@@ -82,10 +62,7 @@ export function VideoPlayer({
 
           {/* Progress bar */}
           <div
-            className={cn(
-              "w-full h-2 rounded-full overflow-hidden",
-              isDark ? "bg-zinc-800" : "bg-zinc-200",
-            )}
+            className="w-full h-2 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800"
           >
             <div
               className="h-full rounded-full transition-all duration-300 ease-out bg-blue-500"
@@ -95,10 +72,10 @@ export function VideoPlayer({
 
           {/* Speed & ETA */}
           <div className="flex justify-between text-[10px] font-mono">
-            <span className={textMuted}>
+            <span className="text-zinc-500 dark:text-zinc-400">
               Speed: {downloadProgress.speed || "--"}
             </span>
-            <span className={textMuted}>
+            <span className="text-zinc-500 dark:text-zinc-400">
               ETA: {downloadProgress.eta || "--"}
             </span>
           </div>
@@ -112,19 +89,13 @@ export function VideoPlayer({
           {/* Phase badge */}
           <div className="flex items-center justify-between">
             <span
-              className={cn(
-                "text-[10px] font-mono flex items-center gap-1.5",
-                isDark ? "text-emerald-400" : "text-emerald-600",
-              )}
+              className="text-[10px] font-mono flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Downloading to your device...
             </span>
             <span
-              className={cn(
-                "text-[10px] font-mono font-bold",
-                isDark ? "text-zinc-300" : "text-zinc-700",
-              )}
+              className="text-[10px] font-mono font-bold text-zinc-700 dark:text-zinc-300"
             >
               {downloadProgress.filePercent}%
             </span>
@@ -132,10 +103,7 @@ export function VideoPlayer({
 
           {/* Progress bar */}
           <div
-            className={cn(
-              "w-full h-2 rounded-full overflow-hidden",
-              isDark ? "bg-zinc-800" : "bg-zinc-200",
-            )}
+            className="w-full h-2 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800"
           >
             <div
               className="h-full rounded-full transition-all duration-150 ease-linear bg-emerald-500"
@@ -145,10 +113,10 @@ export function VideoPlayer({
 
           {/* Transferred / Total */}
           <div className="flex justify-between text-[10px] font-mono">
-            <span className={textMuted}>
+            <span className="text-zinc-500 dark:text-zinc-400">
               Downloaded: {downloadProgress.transferred}
             </span>
-            <span className={textMuted}>
+            <span className="text-zinc-500 dark:text-zinc-400">
               of {downloadProgress.totalSize}
             </span>
           </div>
@@ -157,12 +125,7 @@ export function VideoPlayer({
           {onCancelDownload && (
             <button
               onClick={onCancelDownload}
-              className={cn(
-                "w-full text-[10px] font-mono px-3 py-1.5 rounded-lg border transition",
-                isDark
-                  ? "border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-800"
-                  : "border-zinc-200 text-zinc-500 hover:text-red-600 hover:border-red-300",
-              )}
+              className="w-full text-[10px] font-mono px-3 py-1.5 rounded-lg border transition border-zinc-200 text-zinc-500 hover:text-red-600 hover:border-red-300 dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-red-400 dark:hover:border-red-800"
             >
               Cancel Download
             </button>
@@ -174,12 +137,7 @@ export function VideoPlayer({
     if (downloadProgress?.phase === "error") {
       return (
         <div
-          className={cn(
-            "p-3 rounded-lg border text-[10px] font-mono",
-            isDark
-              ? "bg-red-950/20 border-red-800/30 text-red-400"
-              : "bg-red-50 border-red-100 text-red-600",
-          )}
+          className="p-3 rounded-lg border text-[10px] font-mono bg-red-50 border-red-100 text-red-600 dark:bg-red-950/20 dark:border-red-800/30 dark:text-red-400"
         >
           <p className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
@@ -189,12 +147,7 @@ export function VideoPlayer({
           </p>
           <button
             onClick={onDownload}
-            className={cn(
-              "mt-2 text-[10px] px-3 py-1 rounded-lg border transition inline-flex items-center gap-1.5",
-              isDark
-                ? "border-zinc-800 text-zinc-400 hover:text-zinc-200"
-                : "border-zinc-200 text-zinc-500 hover:text-zinc-700",
-            )}
+            className="mt-2 text-[10px] px-3 py-1 rounded-lg border transition inline-flex items-center gap-1.5 border-zinc-200 text-zinc-500 hover:text-zinc-700 dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
           >
             <RefreshCw className="w-3 h-3" />
             Try Again
@@ -208,29 +161,20 @@ export function VideoPlayer({
 
   return (
     <section
-      className={cn("border rounded-2xl overflow-hidden animate-fade-in", cardBg)}
+      className="border rounded-2xl overflow-hidden animate-fade-in bg-white border-zinc-200 shadow-sm dark:bg-zinc-900 dark:border-zinc-800"
     >
       <div
-        className={cn(
-          "px-4 py-3 border-b flex items-center justify-between gap-2",
-          isDark ? "bg-zinc-950 border-zinc-850" : "bg-zinc-50 border-zinc-200",
-        )}
+        className="px-4 py-3 border-b flex items-center justify-between gap-2 bg-zinc-50 border-zinc-200 dark:bg-zinc-955 dark:border-zinc-850"
       >
         <span
-          className={cn(
-            "text-[9px] sm:text-[10px] font-mono tracking-wider",
-            isDark ? "text-emerald-400" : "text-emerald-600",
-          )}
+          className="text-[9px] sm:text-[10px] font-mono tracking-wider text-emerald-600 dark:text-emerald-400"
         >
           {isDownloading ? "⏳ Downloading..." : "✓ Stream Token Generated"}
         </span>
 
         {isDownloading && (
           <span
-            className={cn(
-              "text-[9px] font-mono",
-              isDark ? "text-zinc-500" : "text-zinc-400",
-            )}
+            className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500"
           >
             {downloadProgress?.phase === "ytdlp"
               ? `${downloadProgress?.ytdlpPercent.toFixed(0)}%`
@@ -242,20 +186,12 @@ export function VideoPlayer({
       <div className="p-4 sm:p-6">
         <div className="mb-4">
           <h3
-            className={cn(
-              "text-[11px] sm:text-xs font-mono uppercase tracking-widest mb-2",
-              isDark ? "text-zinc-400" : "text-zinc-500",
-            )}
+            className="text-[11px] sm:text-xs font-mono uppercase tracking-widest mb-2 text-zinc-500 dark:text-zinc-400"
           >
             Video Preview
           </h3>
           <div
-            className={cn(
-              "relative aspect-video rounded-xl overflow-hidden border",
-              isDark
-                ? "bg-zinc-950 border-zinc-850"
-                : "bg-zinc-100 border-zinc-250 shadow-sm",
-            )}
+            className="relative aspect-video rounded-xl overflow-hidden border bg-zinc-100 border-zinc-250 shadow-sm dark:bg-zinc-950 dark:border-zinc-850"
           >
             <img
               src={parsedVideo.thumbnail}
@@ -267,20 +203,17 @@ export function VideoPlayer({
 
         <div className="space-y-3">
           <h3
-            className={cn(
-              "text-[11px] sm:text-xs font-mono uppercase tracking-widest",
-              isDark ? "text-zinc-400" : "text-zinc-500",
-            )}
+            className="text-[11px] sm:text-xs font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400"
           >
             Play or Download
           </h3>
 
           {/* Progress section — shown during download */}
-          {isDownloading && <div className={cn("p-4 rounded-xl border", innerCardBg)}>{renderProgress()}</div>}
+          {isDownloading && <div className="p-4 rounded-xl border bg-zinc-50 border-zinc-200 dark:bg-zinc-955 dark:border-zinc-850">{renderProgress()}</div>}
 
           {/* Error state */}
           {downloadProgress?.phase === "error" && (
-            <div className={cn("p-4 rounded-xl border", innerCardBg)}>{renderProgress()}</div>
+            <div className="p-4 rounded-xl border bg-zinc-50 border-zinc-200 dark:bg-zinc-955 dark:border-zinc-850">{renderProgress()}</div>
           )}
 
           {/* Action buttons — hidden during download */}
@@ -288,10 +221,7 @@ export function VideoPlayer({
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={onOpenInNewTab}
-                className={cn(
-                  "flex-1 text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2",
-                  btnPrimary,
-                )}
+                className="flex-1 text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>Open in New Tab</span>
@@ -304,7 +234,7 @@ export function VideoPlayer({
                   "flex-1 text-xs font-bold px-4 py-3 rounded-xl transition flex items-center justify-center gap-2",
                   isLoading
                     ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
-                    : btnPrimary,
+                    : "bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950",
                 )}
               >
                 {isLoading ? (
@@ -323,12 +253,7 @@ export function VideoPlayer({
           )}
 
           <div
-            className={cn(
-              "p-3 rounded-lg border text-[10px] font-mono",
-              isDark
-                ? "bg-zinc-950 border-zinc-850 text-zinc-500"
-                : "bg-zinc-50 border-zinc-200 text-zinc-500",
-            )}
+            className="p-3 rounded-lg border text-[10px] font-mono bg-zinc-50 border-zinc-200 text-zinc-500 dark:bg-zinc-955 dark:border-zinc-850 dark:text-zinc-500"
           >
             <p className="flex items-center gap-2">
               <Info className="w-3.5 h-3.5 shrink-0" />
@@ -343,3 +268,4 @@ export function VideoPlayer({
     </section>
   );
 }
+

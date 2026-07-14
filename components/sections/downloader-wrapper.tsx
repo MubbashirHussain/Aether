@@ -32,7 +32,7 @@ import {
 } from "@/lib/download-manager";
 
 // Lazy-load AdInspector in the same wrapper if needed, or define/import it
-import { useTheme } from "@/context/AppContext";
+import { useBottomAd } from "@/context/AppContext";
 
 interface Format {
   quality: string;
@@ -74,7 +74,6 @@ interface DownloadHistoryItem {
 }
 
 export default function DownloaderWrapper() {
-  const { isDark } = useTheme();
   const {
     adsenseClientId,
     topBannerSlotId,
@@ -121,7 +120,7 @@ export default function DownloaderWrapper() {
   >("overview");
   const [selectedAdForCode, setSelectedAdForCode] =
     useState<string>("leaderboard");
-  const { setShowStickyBottomAd, showStickyBottomAd } = useTheme();
+  const { setShowStickyBottomAd, showStickyBottomAd } = useBottomAd();
 
   const [showInterstitial, setShowInterstitial] = useState<boolean>(false);
   const [pendingDownloadItem, setPendingDownloadItem] = useState<
@@ -613,13 +612,11 @@ export default function DownloaderWrapper() {
         <Notification
           message={notification.message}
           type={notification.type as "success" | "info"}
-          isDark={isDark}
           onClose={() => setNotification(null)}
         />
       )}
 
       <AdBanner
-        isDark={isDark}
         highlightAds={highlightAds}
         onHighlightToggle={() => setHighlightAds(!highlightAds)}
         clientId={adsenseClientId}
@@ -630,7 +627,6 @@ export default function DownloaderWrapper() {
         {/* Main Downloader Field */}
         <div className="lg:col-span-8">
           <VideoDownloader
-            isDark={isDark}
             videoUrl={videoUrl}
             detectedPlatform={detectedPlatform}
             isLoading={isLoading}
@@ -643,10 +639,7 @@ export default function DownloaderWrapper() {
 
         {/* Sidebar Banner Ad */}
         <div
-          className={cn(
-            "lg:col-span-4 rounded-2xl p-4 sm:p-6 backdrop-blur-sm min-h-[300px] h-full flex items-center justify-center",
-            isDark ? "skeleton-shimmer-dark" : "skeleton-shimmer-light",
-          )}
+          className="lg:col-span-4 rounded-2xl p-4 sm:p-6 backdrop-blur-sm min-h-[300px] h-full flex items-center justify-center skeleton-shimmer-light dark:skeleton-shimmer-dark"
         >
           <AdSenseSlot
             slotId={sidebarSlotId}
@@ -664,19 +657,11 @@ export default function DownloaderWrapper() {
       {/* Resume incomplete downloads banner */}
       {resumeEntries.length > 0 && (
         <section
-          className={cn(
-            "rounded-2xl p-4 border mt-6",
-            isDark
-              ? "bg-amber-950/20 border-amber-500/30"
-              : "bg-amber-50 border-amber-400/60",
-          )}
+          className="rounded-2xl p-4 border mt-6 bg-amber-50 border-amber-400/60 dark:bg-amber-950/20 dark:border-amber-500/30"
         >
           <div className="flex items-center justify-between mb-3">
             <h3
-              className={cn(
-                "text-xs font-bold font-mono",
-                isDark ? "text-amber-300" : "text-amber-800",
-              )}
+              className="text-xs font-bold font-mono text-amber-800 dark:text-amber-300"
             >
               ⚡ Resume Incomplete Downloads
             </h3>
@@ -686,12 +671,7 @@ export default function DownloaderWrapper() {
                 setResumeEntries([]);
                 triggerNotification("Cleared resume entries.", "info");
               }}
-              className={cn(
-                "text-[9px] font-mono px-2 py-1 rounded border transition",
-                isDark
-                  ? "border-zinc-800 text-zinc-400 hover:text-zinc-200"
-                  : "border-zinc-200 text-zinc-550 hover:text-zinc-700",
-              )}
+              className="text-[9px] font-mono px-2 py-1 rounded border transition border-zinc-200 text-zinc-550 hover:text-zinc-700 dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
             >
               Clear All
             </button>
@@ -700,27 +680,16 @@ export default function DownloaderWrapper() {
             {resumeEntries.map((entry) => (
               <div
                 key={entry.downloadId}
-                className={cn(
-                  "flex items-center justify-between gap-3 p-3 rounded-xl border text-[11px]",
-                  isDark
-                    ? "bg-zinc-900/40 border-neutral-900"
-                    : "bg-white border-zinc-200",
-                )}
+                className="flex items-center justify-between gap-3 p-3 rounded-xl border text-[11px] bg-white border-zinc-200 dark:bg-zinc-900/40 dark:border-neutral-900"
               >
                 <div className="min-w-0 flex-1">
                   <p
-                    className={cn(
-                      "truncate font-medium",
-                      isDark ? "text-zinc-200" : "text-zinc-800",
-                    )}
+                    className="truncate font-medium text-zinc-800 dark:text-zinc-200"
                   >
                     {entry.url.split("/").pop()?.slice(0, 40) || "Video"}
                   </p>
                   <p
-                    className={cn(
-                      "text-[9px] font-mono mt-0.5",
-                      isDark ? "text-zinc-500" : "text-zinc-400",
-                    )}
+                    className="text-[9px] font-mono mt-0.5 text-zinc-400 dark:text-zinc-500"
                   >
                     {entry.platform} •{" "}
                     {new Date(entry.startedAt).toLocaleString()}
@@ -747,7 +716,6 @@ export default function DownloaderWrapper() {
       {parsedVideo && !streamToken && (
         <div className="mt-6">
           <FormatSelector
-            isDark={isDark}
             parsedVideo={parsedVideo}
             onDownload={handleStartSession}
           />
@@ -758,7 +726,6 @@ export default function DownloaderWrapper() {
       {streamToken && (
         <div className="mt-6">
           <VideoPlayer
-            isDark={isDark}
             parsedVideo={parsedVideo}
             streamToken={streamToken}
             onOpenInNewTab={() => {
@@ -792,7 +759,6 @@ export default function DownloaderWrapper() {
       {/* Platform quick list selector */}
       <div className="mt-6">
         <PlatformSelector
-          isDark={isDark}
           activePlatform={activePlatform}
           onPlatformChange={setActivePlatform}
         />
@@ -801,12 +767,7 @@ export default function DownloaderWrapper() {
       {/* Sticky Bottom anchor banner */}
       {showStickyBottomAd && (
         <div
-          className={cn(
-            "fixed bottom-0 left-0 right-0 z-40 border-t py-3.5 backdrop-blur-md transition-colors duration-300 ",
-            isDark
-              ? "bg-black/95 border-neutral-900"
-              : "bg-white/95 border-zinc-200",
-          )}
+          className="fixed bottom-0 left-0 right-0 z-40 border-t py-3.5 backdrop-blur-md transition-colors duration-300 bg-white/95 border-zinc-200 dark:bg-black/95 dark:border-neutral-900"
         >
           <div className="max-w-5xl mx-auto px-4 relative flex flex-col items-center">
             <button
@@ -814,22 +775,14 @@ export default function DownloaderWrapper() {
                 setShowStickyBottomAd(false);
                 triggerNotification("Bottom anchor ad dismissed.", "info");
               }}
-              className={cn(
-                "absolute -top-7.5 right-4 border text-[9px] font-mono flex items-center gap-1 cursor-pointer p-1 rounded-full shadow-md z-50",
-                isDark
-                  ? "bg-zinc-900 border-neutral-800 text-neutral-400 hover:text-white"
-                  : "bg-white border-zinc-200 text-zinc-550 hover:text-zinc-800",
-              )}
+              className="absolute -top-7.5 right-4 border text-[9px] font-mono flex items-center gap-1 cursor-pointer p-1 rounded-full shadow-md z-50 bg-white border-zinc-200 text-zinc-550 hover:text-zinc-800 dark:bg-zinc-900 dark:border-neutral-800 dark:text-neutral-400 dark:hover:text-white"
               title="Close Sponsor"
             >
               <X className="w-3 h-3" /> Close Ad
             </button>
 
             <div
-              className={cn(
-                "w-full flex justify-centerrounded-lg overflow-hidden transition-all rounded-xl",
-                isDark ? "skeleton-shimmer-dark" : "skeleton-shimmer-light",
-              )}
+              className="w-full flex justify-center rounded-lg overflow-hidden transition-all rounded-xl skeleton-shimmer-light dark:skeleton-shimmer-dark"
             >
               <AdSenseSlot
                 clientId={adsenseClientId}

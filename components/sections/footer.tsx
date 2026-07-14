@@ -1,45 +1,26 @@
 "use client";
 
-import { useTheme } from "@/context/AppContext";
+import { useBottomAd } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
 
 export default function Footer() {
-  const { isDark, showStickyBottomAd } = useTheme();
-
-  const footerBg = isDark
-    ? "bg-black border-t border-neutral-900"
-    : "bg-white border-t border-zinc-200 shadow-sm";
-  const textColor = isDark ? "text-neutral-500" : "text-zinc-450";
-  const titleColor = isDark ? "text-neutral-300" : "text-zinc-900";
-  const linkColor = isDark
-    ? "text-neutral-400 hover:text-neutral-200"
-    : "text-zinc-650 hover:text-zinc-900";
-  const subBorder = isDark ? "border-neutral-900" : "border-zinc-200";
+  const { showStickyBottomAd } = useBottomAd();
 
   return (
     <footer
       className={cn(
-        "py-12 sm:py-16 relative transition-all duration-300",
+        "py-12 sm:py-16 relative transition-all duration-300 bg-white border-t border-zinc-200 shadow-sm dark:bg-black dark:border-neutral-900",
         showStickyBottomAd && "mb-20",
-        footerBg,
       )}
     >
       <div className="max-w-6xl mx-auto px-6 text-center space-y-8">
         <div
-          className={cn(
-            "flex flex-col sm:flex-row items-center justify-between gap-6 border-b",
-            subBorder,
-          )}
+          className="flex flex-col sm:flex-row items-center justify-between gap-6 border-b border-zinc-200 dark:border-neutral-900"
         >
           {/* Logo & Brand */}
           <div className="flex items-center gap-2">
             <div
-              className={cn(
-                "w-6 h-6 rounded flex items-center justify-center shrink-0 border",
-                isDark
-                  ? "bg-zinc-950 border-neutral-900 text-white"
-                  : "bg-zinc-50 border-zinc-200 text-zinc-900",
-              )}
+              className="w-6 h-6 rounded flex items-center justify-center shrink-0 border bg-zinc-50 border-zinc-200 text-zinc-900 dark:bg-zinc-950 dark:border-neutral-900 dark:text-white"
             >
               <svg
                 className="w-3.5 h-3.5 stroke-[2] stroke-current"
@@ -53,7 +34,7 @@ export default function Footer() {
               </svg>
             </div>
             <span
-              className={cn("text-xs font-light tracking-tight", titleColor)}
+              className="text-xs font-light tracking-tight text-zinc-900 dark:text-neutral-300"
             >
               Aether Downloader Studio
             </span>
@@ -61,10 +42,7 @@ export default function Footer() {
 
           {/* Disclaimer */}
           <p
-            className={cn(
-              "text-[10px] max-w-sm text-center sm:text-right leading-relaxed font-mono font-light",
-              textColor,
-            )}
+            className="text-[10px] max-w-sm text-center sm:text-right leading-relaxed font-mono font-light text-zinc-450 dark:text-neutral-500"
           >
             Independent extraction client interface. Not associated with
             Instagram, TikTok, YouTube, or Facebook. No media streams are
@@ -76,25 +54,25 @@ export default function Footer() {
         <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[10px] font-mono tracking-wider">
           <a
             href="/terms"
-            className={cn("transition-colors duration-200", linkColor)}
+            className="transition-colors duration-200 text-zinc-650 hover:text-zinc-900 dark:text-neutral-400 dark:hover:text-neutral-200"
           >
             TERMS & SERVICE
           </a>
           <a
             href="/privacy"
-            className={cn("transition-colors duration-200", linkColor)}
+            className="transition-colors duration-200 text-zinc-650 hover:text-zinc-900 dark:text-neutral-400 dark:hover:text-neutral-200"
           >
             PRIVACY SETTINGS
           </a>
           <a
             href="/cookies"
-            className={cn("transition-colors duration-200", linkColor)}
+            className="transition-colors duration-200 text-zinc-650 hover:text-zinc-900 dark:text-neutral-400 dark:hover:text-neutral-200"
           >
             COOKIE MATRIX
           </a>
           <a
             href="/contact"
-            className={cn("transition-colors duration-200", linkColor)}
+            className="transition-colors duration-200 text-zinc-650 hover:text-zinc-900 dark:text-neutral-400 dark:hover:text-neutral-200"
           >
             CONTACT WEBMASTER
           </a>
@@ -102,10 +80,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div
-          className={cn(
-            "text-[9px] font-mono tracking-widest uppercase font-light",
-            textColor,
-          )}
+          className="text-[9px] font-mono tracking-widest uppercase font-light text-zinc-450 dark:text-neutral-500"
         >
           <p>
             © {new Date().getFullYear()} Aether Downloader. Engineered for high
@@ -116,3 +91,4 @@ export default function Footer() {
     </footer>
   );
 }
+
