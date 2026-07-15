@@ -1,4 +1,4 @@
-import { API_BASE } from "@/app/constant";
+const API_BASE = process.env.NEXT_BACKEND_PUBLIC_API_URL;
 
 /**
  * Stores incomplete download info in localStorage so the user can resume.
@@ -56,11 +56,14 @@ export async function initDownload(
   formatId: string,
   isAudioAvailable: boolean,
 ): Promise<string> {
-  const res = await fetch(`${API_BASE}/api/download/format/init`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url, formatId, isAudioAvailable }),
-  });
+  const res = await fetch(
+    `${process.env.NEXT_BACKEND_PUBLIC_API_URL}/api/download/format/init`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url, formatId, isAudioAvailable }),
+    },
+  );
 
   if (!res.ok) {
     const err = await res.json().catch(() => null);

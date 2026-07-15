@@ -1,4 +1,4 @@
-import { API_BASE } from "@/app/constant";
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_PUBLIC_API_URL;
 
 interface FormatItem {
   formatId: string;
