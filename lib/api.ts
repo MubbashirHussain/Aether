@@ -10,13 +10,16 @@ interface FormatItem {
 }
 
 interface SafeVideoMetadata {
-  platform: string;
-  id: string;
-  title: string;
-  thumbnail: string;
-  duration: number;
-  author: string;
-  formats: FormatItem[];
+  data?: {
+    platform: string;
+    id: string;
+    title: string;
+    thumbnail: string;
+    duration: number;
+    author: string;
+    formats: FormatItem[];
+  };
+  error?: string;
 }
 
 interface SessionResponse {
@@ -33,6 +36,10 @@ export async function fetchAPI(
   url: string,
   options?: RequestInit,
 ): Promise<Response> {
+  if (!API_BASE) {
+    console.log("Missing NEXT_PUBLIC_BACKEND_PUBLIC_API_URL");
+    throw new Error("Missing NEXT_PUBLIC_BACKEND_PUBLIC_API_URL");
+  }
   const response = await fetch(`${API_BASE}${url}`, {
     ...options,
     headers: {
@@ -44,6 +51,10 @@ export async function fetchAPI(
 }
 
 export async function analyzeUrl(url: string): Promise<SafeVideoMetadata> {
+  if (!API_BASE) {
+    console.log("Missing NEXT_PUBLIC_BACKEND_PUBLIC_API_URL");
+    return { error: "Missing NEXT_PUBLIC_BACKEND_PUBLIC_API_URL" };
+  }
   const res = await fetchAPI("/api/download", {
     method: "POST",
     body: JSON.stringify({ url }),
@@ -51,9 +62,9 @@ export async function analyzeUrl(url: string): Promise<SafeVideoMetadata> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => null);
-    throw new Error(
-      err?.errors?.[0]?.message || `Analysis failed (${res.status})`,
-    );
+    return {
+      error: err?.errors?.[0]?.message || `Analysis failed (${res.status})`,
+    };
   }
 
   const json = await res.json();

@@ -22,7 +22,6 @@ import {
   UnlockData,
 } from "@/lib/api";
 
-
 // Lazy-load AdInspector in the same wrapper if needed, or define/import it
 import { useBottomAd } from "@/context/AppContext";
 
@@ -182,9 +181,14 @@ export default function DownloaderWrapper() {
     setStreamToken(null);
 
     try {
-      const result = await analyzeUrl(videoUrl);
+      const { data: result, error } = await analyzeUrl(videoUrl);
       setProgress(100);
       setIsLoading(false);
+
+      if (error || !result) {
+        setErrorMessage(error || "No result found");
+        return;
+      }
 
       setParsedVideo({
         title: result.title,
@@ -310,8 +314,7 @@ export default function DownloaderWrapper() {
         res.headers.get("content-length") || "0",
         10,
       );
-      const contentType =
-        res.headers.get("content-type") || "video/mp4";
+      const contentType = res.headers.get("content-type") || "video/mp4";
 
       // Determine extension from content type
       const ext = contentType.includes("mp4")
