@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const runtime = "edge";
 
 export async function GET(request) {
   // Use native request.url parsing for raw compatibility
@@ -82,9 +83,12 @@ export async function GET(request) {
     });
   } catch (error) {
     console.error("Critical Stream Proxy Exception:", error);
-    return new NextResponse(JSON.stringify({ error: "Internal Gateway Error" }), {
-      status: 502,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new NextResponse(
+      JSON.stringify({ error: "Internal Gateway Error" }),
+      {
+        status: 502,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 }
