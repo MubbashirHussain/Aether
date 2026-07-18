@@ -19,23 +19,16 @@ import {
   startSession,
   unlockSession,
   getStreamUrl,
+  UnlockData,
 } from "@/lib/api";
-import {
-  initDownload,
-  waitForDownload,
-  downloadFile,
-  triggerDownload,
-  saveResumeState,
-  removeResumeState,
-  getResumeDownloads,
-  getResumeEntry,
-} from "@/lib/download-manager";
+
 
 // Lazy-load AdInspector in the same wrapper if needed, or define/import it
 import { useBottomAd } from "@/context/AppContext";
 
 interface Format {
   quality: string;
+  resolution: string;
   size: string;
   label: string;
 }
@@ -55,6 +48,7 @@ interface ParsedVideo extends VideoPreview {
   originalUrl: string;
   formats: {
     quality: string;
+    resolution: string;
     size: string;
     label: string;
     formatId: string;
@@ -122,174 +116,17 @@ export default function DownloaderWrapper() {
     useState<string>("leaderboard");
   const { setShowStickyBottomAd, showStickyBottomAd } = useBottomAd();
 
-  const [showInterstitial, setShowInterstitial] = useState<boolean>(false);
-  const [pendingDownloadItem, setPendingDownloadItem] = useState<
-    | (ParsedVideo & {
-        chosenQuality: string;
-        chosenSize: string;
-        formatId: string;
-        isAudioAvailable: boolean;
-      })
-    | null
-  >(null);
-
   const [streamToken, setStreamToken] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [unlockAfter, setUnlockAfter] = useState<number>(0);
-  const [countdown, setCountdown] = useState<number>(0);
+  const [activeFormatId, setActiveFormatId] = useState<string | null>(null);
+  const [unlockCountdown, setUnlockCountdown] = useState<number>(0);
 
-  // Download progress tracking
-  const [downloadProgress, setDownloadProgress] = useState<{
-    phase: "idle" | "ytdlp" | "file" | "completed" | "error";
-    downloadId: string | null;
-    ytdlpPercent: number;
-    filePercent: number;
-    speed: string;
-    eta: string;
-    transferred: string;
-    totalSize: string;
-    error?: string;
-  }>({
-    phase: "idle",
-    downloadId: null,
-    ytdlpPercent: 0,
-    filePercent: 0,
-    speed: "",
-    eta: "",
-    transferred: "0 B",
-    totalSize: "",
-  });
-
-  // Abort controller for cancelling file download
-  const [downloadAbortController, setDownloadAbortController] =
-    useState<AbortController | null>(null);
-
-  // Check for resume-able downloads on mount
-  const [resumeEntries, setResumeEntries] = useState<
-    { downloadId: string; url: string; platform: string; startedAt: number }[]
-  >([]);
-
-  useEffect(() => {
-    const entries = getResumeDownloads();
-    const valid: typeof resumeEntries = [];
-
-    const checks = entries.map(async (entry) => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_BACKEND_PUBLIC_API_URL}/api/download/format/status/${entry.downloadId}`,
-        );
-        const json = await res.json();
-        if (json.success && json.data.status === "completed") {
-          valid.push({
-            downloadId: entry.downloadId,
-            url: entry.url,
-            platform: entry.platform || "video",
-            startedAt: entry.startedAt,
-          });
-        } else {
-          removeResumeState(entry.downloadId);
-        }
-      } catch {
-        removeResumeState(entry.downloadId);
-      }
-    });
-
-    Promise.all(checks).then(() => {
-      setResumeEntries(valid);
-      if (valid.length > 0) {
-        triggerNotification(
-          `${valid.length} incomplete download${valid.length > 1 ? "s" : ""} available to resume.`,
-          "info",
-        );
-      }
-    });
-  }, []);
-
-  const handleResume = async (downloadId: string) => {
-    try {
-      const entry = getResumeEntry(downloadId);
-      if (!entry) {
-        triggerNotification("Download data not found.", "info");
-        return;
-      }
-
-      setIsLoading(true);
-      setDownloadProgress({
-        phase: "file",
-        downloadId,
-        ytdlpPercent: 100,
-        filePercent: 0,
-        speed: "",
-        eta: "",
-        transferred: "0 B",
-        totalSize: formatBytes(entry.totalSize),
-      });
-
-      const abortController = new AbortController();
-      setDownloadAbortController(abortController);
-
-      const blob = await downloadFile(
-        downloadId,
-        (fileProgress) => {
-          setDownloadProgress((prev) => ({
-            ...prev,
-            filePercent: fileProgress.percent,
-            transferred: formatBytes(fileProgress.transferred),
-            totalSize: formatBytes(fileProgress.total),
-          }));
-
-          if (fileProgress.percent % 5 === 0 && fileProgress.percent > 0) {
-            saveResumeState({
-              ...entry,
-              downloadedBytes: fileProgress.transferred,
-              startedAt: Date.now(),
-            });
-          }
-        },
-        abortController.signal,
-        entry.downloadedBytes || 0,
-      );
-
-      setDownloadProgress((prev) => ({ ...prev, phase: "completed" }));
-
-      const ext = blob.type.includes("mp4")
-        ? "mp4"
-        : blob.type.includes("webm")
-          ? "webm"
-          : "mp4";
-      triggerDownload(blob, `resumed_video_${Date.now()}.${ext}`);
-
-      removeResumeState(downloadId);
-      setResumeEntries((prev) =>
-        prev.filter((e) => e.downloadId !== downloadId),
-      );
-
-      triggerNotification("Download resumed successfully!", "success");
-    } catch (error: any) {
-      if (
-        error.message?.includes("404") ||
-        error.message?.includes("not found")
-      ) {
-        removeResumeState(downloadId);
-        setResumeEntries((prev) =>
-          prev.filter((e) => e.downloadId !== downloadId),
-        );
-        triggerNotification(
-          "Download expired on server. Please start again.",
-          "info",
-        );
-      } else {
-        setDownloadProgress((prev) => ({
-          ...prev,
-          phase: "error",
-          error: error.error,
-        }));
-      }
-    } finally {
-      setIsLoading(false);
-      setDownloadAbortController(null);
-    }
-  };
+  // Stream download state
+  const [isDownloadingStream, setIsDownloadingStream] = useState(false);
+  const [streamProgress, setStreamProgress] = useState<{
+    total: number;
+    downloaded: number;
+  } | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const triggerNotification = (
     message: string,
@@ -357,6 +194,7 @@ export default function DownloaderWrapper() {
         likes: "N/A",
         formats: result.formats.map((f, idx) => ({
           quality: f.quality || f.resolution,
+          resolution: f.resolution,
           size: f.filesize
             ? `${(f.filesize / 1024 / 1024).toFixed(2)} MB`
             : `${(f.filesize || 0).toLocaleString()} bytes`,
@@ -392,197 +230,157 @@ export default function DownloaderWrapper() {
   const handleStartSession = async (
     format: Format,
     formatId: string,
-    isAudioAvailable: boolean,
+    _isAudioAvailable: boolean,
   ) => {
     if (!parsedVideo) return;
 
     try {
-      setIsLoading(true);
+      setActiveFormatId(formatId);
       setErrorMessage("");
-      setPendingDownloadItem({
-        ...parsedVideo,
-        chosenQuality: format.quality,
-        chosenSize: format.size,
-        formatId,
-        isAudioAvailable,
-      });
+      setStreamToken(null);
+      setDownloadError(null);
 
-      const session = await startSession(videoUrl);
-      setSessionId(session.sessionId);
-      setUnlockAfter(session.unlockAfter);
-      setCountdown(session.unlockAfter);
-      setShowInterstitial(true);
+      // 1. Start session — gets unlockAfter
+      const session = await startSession(videoUrl, formatId);
 
-      const interval = setInterval(() => {
-        setCountdown((prev) => {
+      // 2. Show countdown on the button while waiting for unlockAfter
+      setUnlockCountdown(session.unlockAfter);
+      const tick = setInterval(() => {
+        setUnlockCountdown((prev) => {
           if (prev <= 1) {
-            clearInterval(interval);
+            clearInterval(tick);
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
 
-      setTimeout(async () => {
+      // 3. Poll unlock after the initial wait
+      const pollUnlock = async (sid: string) => {
         try {
-          const unlocked = await unlockSession(session.sessionId);
-          setStreamToken(unlocked.streamToken);
-          clearInterval(interval);
+          const result = await unlockSession(sid);
+          // Check if still locked
+          if ("unlocked" in result) {
+            const wait = Math.max(result.unlockAfter, 1);
+            setTimeout(() => pollUnlock(sid), wait * 1000);
+            return;
+          }
+          // Unlocked — result is UnlockData
+          setStreamToken((result as UnlockData).streamToken);
+          setActiveFormatId(null);
+          clearInterval(tick);
           triggerNotification("Download unlocked successfully!", "success");
         } catch (error: any) {
+          setActiveFormatId(null);
+          clearInterval(tick);
           setErrorMessage(error.message || "Failed to unlock download");
-          clearInterval(interval);
         }
-      }, session.unlockAfter * 1000);
+      };
+
+      setTimeout(
+        () => pollUnlock(session.sessionId),
+        session.unlockAfter * 1000,
+      );
     } catch (error: any) {
-      setIsLoading(false);
+      setActiveFormatId(null);
       setErrorMessage(error.message || "Failed to start download session");
     }
   };
 
   const handleDownload = async () => {
-    if (!pendingDownloadItem) return;
-    setShowInterstitial(false);
+    if (!streamToken) {
+      setErrorMessage("No stream token available. Please try again.");
+      return;
+    }
 
     try {
-      setIsLoading(true);
+      setIsDownloadingStream(true);
+      setStreamProgress(null);
+      setDownloadError(null);
 
-      setDownloadProgress({
-        phase: "ytdlp",
-        downloadId: null,
-        ytdlpPercent: 0,
-        filePercent: 0,
-        speed: "",
-        eta: "",
-        transferred: "0 B",
-        totalSize: "",
-      });
+      // Fetch the stream with ?download=1
+      const streamUrl = getStreamUrl(streamToken, true);
+      const res = await fetch(streamUrl);
 
-      const downloadId = await initDownload(
-        pendingDownloadItem.originalUrl,
-        pendingDownloadItem.formatId,
-        pendingDownloadItem.isAudioAvailable,
+      if (!res.ok) {
+        throw new Error(`Stream failed (${res.status})`);
+      }
+
+      const contentLength = parseInt(
+        res.headers.get("content-length") || "0",
+        10,
       );
+      const contentType =
+        res.headers.get("content-type") || "video/mp4";
 
-      setDownloadProgress((prev) => ({ ...prev, downloadId }));
-
-      await waitForDownload(downloadId, (progress) => {
-        setDownloadProgress((prev) => ({
-          ...prev,
-          phase:
-            progress.status === "error"
-              ? "error"
-              : progress.status === "completed"
-                ? "file"
-                : "ytdlp",
-          ytdlpPercent: progress.percent,
-          speed: progress.speed,
-          eta: progress.eta,
-          totalSize: formatBytes(progress.totalSize),
-          error: progress.error,
-        }));
-      });
-
-      const abortController = new AbortController();
-      setDownloadAbortController(abortController);
-
-      setDownloadProgress((prev) => ({
-        ...prev,
-        phase: "file",
-        filePercent: 0,
-      }));
-
-      const blob = await downloadFile(
-        downloadId,
-        (fileProgress) => {
-          setDownloadProgress((prev) => ({
-            ...prev,
-            filePercent: fileProgress.percent,
-            transferred: formatBytes(fileProgress.transferred),
-            totalSize: formatBytes(fileProgress.total),
-            speed: fileProgress.percent > 0 ? `${fileProgress.percent}%` : "",
-          }));
-
-          if (fileProgress.percent % 5 === 0 && fileProgress.percent > 0) {
-            saveResumeState({
-              downloadId,
-              downloadedBytes: fileProgress.transferred,
-              totalSize: fileProgress.total,
-              url: pendingDownloadItem.originalUrl,
-              formatId: pendingDownloadItem.formatId,
-              isAudioAvailable: pendingDownloadItem.isAudioAvailable,
-              platform: pendingDownloadItem.platform,
-              startedAt: Date.now(),
-            });
-          }
-        },
-        abortController.signal,
-        0,
-      );
-
-      setDownloadProgress((prev) => ({ ...prev, phase: "completed" }));
-
-      const ext = blob.type.includes("mp4")
+      // Determine extension from content type
+      const ext = contentType.includes("mp4")
         ? "mp4"
-        : blob.type.includes("webm")
+        : contentType.includes("webm")
           ? "webm"
           : "mp4";
-      triggerDownload(
-        blob,
-        `${pendingDownloadItem.platform}_video_${Date.now()}.${ext}`,
-      );
 
-      removeResumeState(downloadId);
+      if (!res.body) {
+        throw new Error("Response has no body stream");
+      }
 
-      const updatedHistory: DownloadHistoryItem[] = [
-        {
-          id: pendingDownloadItem.id,
-          title: pendingDownloadItem.title,
-          platform: pendingDownloadItem.platform,
-          url: pendingDownloadItem.originalUrl,
-          thumbnail: pendingDownloadItem.thumbnail,
+      // Stream the response body, tracking progress
+      const reader = res.body.getReader();
+      const chunks: Uint8Array[] = [];
+      let downloaded = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        chunks.push(value);
+        downloaded += value.length;
+
+        setStreamProgress({
+          total: contentLength || downloaded,
+          downloaded,
+        });
+      }
+
+      // All bytes received — build blob and trigger download
+      const blob = new Blob(chunks as BlobPart[], { type: contentType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `video_${Date.now()}.${ext}`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setIsDownloadingStream(false);
+
+      // Update download history
+      if (parsedVideo) {
+        const entry: DownloadHistoryItem = {
+          id: parsedVideo.id,
+          title: parsedVideo.title,
+          platform: parsedVideo.platform,
+          url: videoUrl,
+          thumbnail: parsedVideo.thumbnail,
           timestamp: "Just now",
-          formatId: pendingDownloadItem.formatId,
-          isAudioAvailable: pendingDownloadItem.isAudioAvailable,
-        },
-        ...downloadHistory.filter(
-          (item) => item.url !== pendingDownloadItem.originalUrl,
-        ),
-      ].slice(0, 6);
+          formatId: "",
+          isAudioAvailable: true,
+        };
+        const updated = [entry, ...downloadHistory]
+          .filter(
+            (item, idx, arr) =>
+              idx === arr.findIndex((h) => h.url === item.url),
+          )
+          .slice(0, 6);
+        setDownloadHistory(updated);
+        localStorage.setItem("vdl_premium_history", JSON.stringify(updated));
+      }
 
-      setDownloadHistory(updatedHistory);
-      localStorage.setItem(
-        "vdl_premium_history",
-        JSON.stringify(updatedHistory),
-      );
-
-      setShowInterstitial(false);
-      setPendingDownloadItem(null);
-      setStreamToken(null);
-      setSessionId(null);
-      triggerNotification(
-        `Successfully downloaded: ${pendingDownloadItem.chosenQuality}`,
-        "success",
-      );
+      triggerNotification("Download complete!", "success");
     } catch (error: any) {
-      setErrorMessage(error.message || "Failed to download video");
-      setDownloadProgress((prev) => ({
-        ...prev,
-        phase: "error",
-        error: error.message,
-      }));
-    } finally {
-      setIsLoading(false);
-      setDownloadAbortController(null);
+      setIsDownloadingStream(false);
+      setStreamProgress(null);
+      setDownloadError(error.message || "Download failed");
     }
-  };
-
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
   };
 
   const handleCopyHistory = (url: string, index: number) => {
@@ -652,62 +450,14 @@ export default function DownloaderWrapper() {
         </div>
       </div>
 
-      {/* Resume incomplete downloads banner */}
-      {resumeEntries.length > 0 && (
-        <section className="rounded-2xl p-4 border mt-6 bg-amber-50 border-amber-400/60 dark:bg-amber-950/20 dark:border-amber-500/30">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-bold font-mono text-amber-800 dark:text-amber-300">
-              ⚡ Resume Incomplete Downloads
-            </h3>
-            <button
-              onClick={() => {
-                resumeEntries.forEach((e) => removeResumeState(e.downloadId));
-                setResumeEntries([]);
-                triggerNotification("Cleared resume entries.", "info");
-              }}
-              className="text-[9px] font-mono px-2 py-1 rounded border transition border-zinc-200 text-zinc-550 hover:text-zinc-700 dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
-            >
-              Clear All
-            </button>
-          </div>
-          <div className="flex flex-col gap-2">
-            {resumeEntries.map((entry) => (
-              <div
-                key={entry.downloadId}
-                className="flex items-center justify-between gap-3 p-3 rounded-xl border text-[11px] bg-white border-zinc-200 dark:bg-zinc-900/40 dark:border-neutral-900"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-zinc-800 dark:text-zinc-200">
-                    {entry.url.split("/").pop()?.slice(0, 40) || "Video"}
-                  </p>
-                  <p className="text-[9px] font-mono mt-0.5 text-zinc-400 dark:text-zinc-500">
-                    {entry.platform} •{" "}
-                    {new Date(entry.startedAt).toLocaleString()}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleResume(entry.downloadId)}
-                  disabled={isLoading}
-                  className="shrink-0 text-[10px] font-bold px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center gap-1.5"
-                >
-                  {isLoading ? (
-                    <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin" />
-                  ) : (
-                    "Resume"
-                  )}
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* Format Selector Overlay */}
       {parsedVideo && !streamToken && (
         <div className="mt-6">
           <FormatSelector
             parsedVideo={parsedVideo}
             onDownload={handleStartSession}
+            loadingFormatId={activeFormatId}
+            countdown={unlockCountdown}
           />
         </div>
       )}
@@ -726,22 +476,10 @@ export default function DownloaderWrapper() {
               element.click();
             }}
             onDownload={handleDownload}
-            isLoading={isLoading}
-            downloadProgress={downloadProgress}
-            onCancelDownload={() => {
-              downloadAbortController?.abort();
-              setDownloadProgress({
-                phase: "idle",
-                downloadId: null,
-                ytdlpPercent: 0,
-                filePercent: 0,
-                speed: "",
-                eta: "",
-                transferred: "0 B",
-                totalSize: "",
-              });
-              triggerNotification("Download cancelled", "info");
-            }}
+            isDownloading={isDownloadingStream}
+            streamProgress={streamProgress}
+            downloadError={downloadError}
+            onRetryDownload={handleDownload}
           />
         </div>
       )}

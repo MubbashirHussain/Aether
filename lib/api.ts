@@ -24,8 +24,8 @@ interface SessionResponse {
   unlockAfter: number;
 }
 
-interface UnlockResponse {
-  metadata: SafeVideoMetadata;
+export interface UnlockData {
+  selectedFormat: FormatItem;
   streamToken: string;
 }
 
@@ -60,10 +60,13 @@ export async function analyzeUrl(url: string): Promise<SafeVideoMetadata> {
   return json.data;
 }
 
-export async function startSession(url: string): Promise<SessionResponse> {
+export async function startSession(
+  url: string,
+  formatId: string,
+): Promise<SessionResponse> {
   const res = await fetchAPI("/api/download/session", {
     method: "POST",
-    body: JSON.stringify({ url }),
+    body: JSON.stringify({ url, formatId }),
   });
 
   if (!res.ok) {
@@ -74,9 +77,15 @@ export async function startSession(url: string): Promise<SessionResponse> {
   return res.json();
 }
 
+/**
+ * Attempt to unlock a session.
+ * Returns unlock data (with streamToken) on success.
+ * Returns the raw data object when still locked: { unlocked: false, unlockAfter }.
+ * Throws on network/parsing errors.
+ */
 export async function unlockSession(
   sessionId: string,
-): Promise<UnlockResponse> {
+): Promise<UnlockData | { unlocked: false; unlockAfter: number }> {
   const res = await fetchAPI("/api/download/unlock", {
     method: "POST",
     body: JSON.stringify({ sessionId }),
@@ -87,14 +96,13 @@ export async function unlockSession(
     throw new Error(err?.message || `Unlock failed (${res.status})`);
   }
 
-  const jsonRes = await res.json();
-
-  return jsonRes.data;
+  const json = await res.json();
+  return json.data;
 }
 
 export function getStreamUrl(streamToken: string, download = false): string {
-  const base = `${API_BASE}/api/download/stream/${streamToken}`;
-  return download ? `${base}?download=1` : base;
+  const base = `/api/video?streamToken=${streamToken}`;
+  return download ? `${base}&download=1` : base;
 }
 
 export async function downloadFormat(
