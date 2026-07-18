@@ -68,7 +68,7 @@ export async function analyzeUrl(url: string): Promise<SafeVideoMetadata> {
   }
 
   const json = await res.json();
-  return json.data;
+  return { data: json.data };
 }
 
 export async function startSession(

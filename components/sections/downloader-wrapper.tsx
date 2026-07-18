@@ -185,36 +185,38 @@ export default function DownloaderWrapper() {
       setProgress(100);
       setIsLoading(false);
 
-      if (error || !result) {
+      if (error && !result) {
         setErrorMessage(error || "No result found");
         return;
       }
 
-      setParsedVideo({
-        title: result.title,
-        thumbnail: result.thumbnail,
-        duration: `${Math.floor(result.duration / 60)}:${(result.duration % 60).toString().padStart(2, "0")}`,
-        author: result.author,
-        likes: "N/A",
-        formats: result.formats.map((f, idx) => ({
-          quality: f.quality || f.resolution,
-          resolution: f.resolution,
-          size: f.filesize
-            ? `${(f.filesize / 1024 / 1024).toFixed(2)} MB`
-            : `${(f.filesize || 0).toLocaleString()} bytes`,
-          label: idx === 0 ? "Best Quality" : "Alternative",
-          formatId: f.formatId,
-          isAudioAvailable: f.isAudioAvailable,
-        })),
-        id: result.id,
-        platform: result.platform,
-        originalUrl: videoUrl,
-      });
+      if (result) {
+        setParsedVideo({
+          title: result.title,
+          thumbnail: result.thumbnail,
+          duration: `${Math.floor(result.duration / 60)}:${(result.duration % 60).toString().padStart(2, "0")}`,
+          author: result.author,
+          likes: "N/A",
+          formats: result.formats.map((f, idx) => ({
+            quality: f.quality || f.resolution,
+            resolution: f.resolution,
+            size: f.filesize
+              ? `${(f.filesize / 1024 / 1024).toFixed(2)} MB`
+              : `${(f.filesize || 0).toLocaleString()} bytes`,
+            label: idx === 0 ? "Best Quality" : "Alternative",
+            formatId: f.formatId,
+            isAudioAvailable: f.isAudioAvailable,
+          })),
+          id: result.id,
+          platform: result.platform,
+          originalUrl: videoUrl,
+        });
 
-      triggerNotification(
-        "CDN stream decrypted and formats loaded successfully!",
-        "success",
-      );
+        triggerNotification(
+          "CDN stream decrypted and formats loaded successfully!",
+          "success",
+        );
+      }
     } catch (error: any) {
       setIsLoading(false);
       setProgress(0);
